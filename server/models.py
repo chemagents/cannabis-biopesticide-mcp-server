@@ -262,14 +262,21 @@ def predict_biopesticides() -> dict:
 
     cut = settings.candidate_probability
     in_domain = ad >= 0.5
+    n = int(meta.sum())
+    raw = int((proba >= cut).sum())                 # paper's definition: pesticide prob > cut
     candidates = int(((proba >= cut) & in_domain).sum())
     return {
-        "n_metabolites": int(meta.sum()),
-        "candidates_prob_gt_0.7": candidates,
-        "candidate_fraction": round(candidates / int(meta.sum()), 4),
+        "n_metabolites": n,
+        "candidates_prob_gt_0.7": candidates,                    # with Tanimoto AD (closest single value)
+        "candidate_fraction": round(candidates / n, 4),
+        "candidates_prob_gt_0.7_no_ad": raw,                     # without AD (paper's literal definition)
+        "candidate_fraction_no_ad": round(raw / n, 4),
         "n_outside_ad": int((~in_domain).sum()),
-        "outside_ad_fraction": round(int((~in_domain).sum()) / int(meta.sum()), 4),
+        "outside_ad_fraction": round(int((~in_domain).sum()) / n, 4),
         "probability_cutoff": cut,
+        "note": "The paper reports 1010 (40.97% of 2465) at prob>0.7. Our GBM is calibrated "
+                "differently than the DMPNN-SD: prob>0.7 flags 49% without AD and 35% with a "
+                "Tanimoto AD, bracketing the paper's 41%. Exact match needs the vendored DMPNN.",
     }
 
 
