@@ -1,0 +1,32 @@
+{
+  "feature_space": "rmt_rte",
+  "features_csv": "features/protein-related/rte.csv",
+  "id_col": "ligand_id",
+  "inner_train_frac": 0.7,
+  "m_grid": null,
+  "m_step": 1,
+  "max_m": 0,
+  "metric": "auto",
+  "modes": [
+    "rmt_rte_sel",
+    "rmt_rte_rec"
+  ],
+  "n_features_total": 390,
+  "n_inner_splits": 4,
+  "n_splits_processed": 1,
+  "out_dir": "pipeline_runs/rmt_rte_filter_scaffold",
+  "outputs": {
+    "per_split": "<split_id>/transform_spec.json and feature CSVs",
+    "selected_features_long": "selected_features_long.csv",
+    "summary": "summary.csv"
+  },
+  "rank_by": "hybrid",
+  "script": "rmt_filter.py",
+  "seed": 42,
+  "set_col": "set",
+  "split_col": "split_id",
+  "split_csv": "repo/results/stage_0_create_splits/split_registry_scaffold.csv",
+  "target_col": "activity",
+  "target_score": "spearman",
+  "target_type": "auto"
+}
