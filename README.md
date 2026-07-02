@@ -54,11 +54,14 @@ inner-CV selection:
 | QSAR ROC-AUC | 0.9283 (DMPNN-SD) | **0.931 (GBM on the 217 descriptors)** |
 | CB-SD residue-level docking | 0.802 (ALL6) | **0.790** |
 | Docking-consistency veto FPR | 12.20% → 4.92% | **15.7% → 5.0% (68% reduction)** |
-| Biopesticide candidates | 1010 (40.97%) | **~948 (35%)** |
+| Biopesticide candidates (prob>0.7) | 1010 (40.97%) | **35% (with AD) … 49% (no AD)** |
 
-The only remaining gap is the candidate fraction (35% vs 41%): the paper's "Probability" is the
-DMPNN's own applicability-domain confidence, which is not reproducible without their exact model;
-here the AD is a Tanimoto kNN Gaussian. Everything else lands within the paper's own ±SD.
+Everything except the candidate fraction lands within the paper's own ±SD. The candidate fraction
+is the one number tied to the proprietary DMPNN: at prob>0.7 our GBM flags **49%** without an
+applicability-domain filter and **35%** with a Tanimoto-kNN AD — the paper's **41%** sits between
+them. This is a model-calibration difference (the DMPNN assigns high probability to fewer
+compounds), not an AD-threshold artifact, so it cannot be matched by tuning a threshold — only by
+running the vendored DMPNN-SD (`server/vendor/`, `pip install .[dmpnn]`).
 
 ### Exact DMPNN-SD (optional, torch)
 
