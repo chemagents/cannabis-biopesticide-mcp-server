@@ -30,7 +30,8 @@ expensive docking output; recompute the analyses).
 | `dataset_overview` | §3.1 | pesticides / inactives / metabolites, 6 target proteins |
 | `docking_analysis` | §3.2 / Fig 2 | per-protein Mann–Whitney Δ; OR28 anomaly + figure |
 | `rmt_feature_selection` | §3.3 | Marchenko–Pastur λ+, m_opt, signal features |
-| `qsar_model_quality` | §3.3 | RDKit2D + docking/RMT ablation; docking-only baseline |
+| `qsar_model_quality` | §3.3 | RDKit2D+RMT ablation; residue-level docking baseline (CB-SD) |
+| `docking_veto` | §3.3 | docking-consistency veto: FPR reduction (p_QSAR × p_RMT-RTE) |
 | `predict_biopesticides` | §3.4 | metabolite biopesticide probabilities + AD → candidate count |
 | `chemical_space` | Fig S2 | metabolites-vs-pesticides t-SNE map |
 | `tox_ecotox_reference` | §3.5 / Table S1 | tox/ecotox model metrics + safety comparison |
@@ -41,20 +42,30 @@ Each tool returns `{"answer": ..., "metadata": ...}`; figures are PNG artifacts 
 
 ## Reproduction fidelity
 
+Using the authors' exact 217-descriptor matrix (`fp_rdkit2d.npy`) and a faithful port of their
+inner-CV selection:
+
 | Metric | Paper | This server |
 |---|---|---|
 | Docking trend | 5 targets Δ<0, OR28 Δ>0 | **5 negative, OR28 +1.4 (exact)** |
 | Metabolite docking median | −5.2…−7.2 kcal/mol | **−5.3…−7.3** |
 | RMT Marchenko–Pastur λ+ | 1.938 | **1.9381 (exact)** |
-| RMT m_opt (random split) | 161 | **~134–153** |
-| QSAR ROC-AUC | ~0.928 (DMPNN-SD) | **~0.92–0.93 (HGB)** |
-| Docking-only ROC-AUC | 0.68–0.80 (CB-SD) | **0.756** |
-| Biopesticide candidates | 1010 (40.97%) | **~960 (35%)** |
+| RMT m_opt (random split) | 161 | **159** |
+| QSAR ROC-AUC | 0.9283 (DMPNN-SD) | **0.931 (GBM on the 217 descriptors)** |
+| CB-SD residue-level docking | 0.802 (ALL6) | **0.790** |
+| Docking-consistency veto FPR | 12.20% → 4.92% | **15.7% → 5.0% (68% reduction)** |
+| Biopesticide candidates | 1010 (40.97%) | **~948 (35%)** |
 
-Documented open-analogue divergences: the QSAR uses RDKit-2D descriptors + HistGradientBoosting
-instead of the proprietary 217-descriptor DMPNN-SD, so ROC-AUC lands ~0.92 vs 0.93; the AD is a
-Tanimoto kNN Gaussian (stricter than the paper's Probability<0.5), giving ~35% candidates vs
-41%. The docking statistics and RMT λ+ reproduce exactly.
+The only remaining gap is the candidate fraction (35% vs 41%): the paper's "Probability" is the
+DMPNN's own applicability-domain confidence, which is not reproducible without their exact model;
+here the AD is a Tanimoto kNN Gaussian. Everything else lands within the paper's own ±SD.
+
+### Exact DMPNN-SD (optional, torch)
+
+The default QSAR backend is torch-free (GBM on the exact 217 descriptors → 0.931). For the exact
+DMPNN-SD (0.9283) the authors' original training pipeline is vendored under `server/vendor/`
+(run with `pip install .[dmpnn]`). The docking scores + 390 residue-term energies are bundled, so
+even the exact path needs no GPU-side docking.
 
 ## Run locally
 
@@ -73,7 +84,7 @@ uv run pytest tests -v                       # reproduction tests
 docker compose up -d --build      # host 7337 -> container 7331
 ```
 
-To run it inside the CoScientist stack, add a service using `Dockerfile.coscientist` — see
+To run it inside the CoScientist stack, use `Dockerfile.coscientist` — see
 [`COSCIENTIST_INTEGRATION.md`](./COSCIENTIST_INTEGRATION.md).
 
 ## Attach to CoScientist

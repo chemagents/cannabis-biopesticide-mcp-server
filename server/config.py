@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     # --- bundled data (from the authors' rmt_canpest package) ---
     data_path: str = Field(default=str(DATA_DIR / "canpest_data.csv"))          # 5920 x SMILES/activity/6-dock
     rte_path: str = Field(default=str(DATA_DIR / "rte.csv"))                     # 390 residue-term energies
+    fp_rdkit2d_path: str = Field(default=str(DATA_DIR / "fp_rdkit2d.npy"))       # authors' exact 217 RDKit2D descriptors
     split_path: str = Field(default=str(DATA_DIR / "split_registry.csv"))       # 10 random splits
     split_scaffold_path: str = Field(default=str(DATA_DIR / "split_registry_scaffold.csv"))
     reference_dir: str = Field(default=str(DATA_DIR / "reference"))

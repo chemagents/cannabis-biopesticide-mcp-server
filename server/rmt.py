@@ -23,6 +23,7 @@ from scipy.stats import spearmanr
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.preprocessing import StandardScaler
 
 from .config import get_settings
 
@@ -74,22 +75,37 @@ def hybrid_ranking(s_i: np.ndarray, Xz: np.ndarray, y: np.ndarray) -> np.ndarray
     return s_i * rho                                       # rank_by = "hybrid"
 
 
-def _select_m(Xz: np.ndarray, y: np.ndarray, order: np.ndarray, settings) -> tuple[int, float, float]:
-    """Inner CV: pick m maximising ROC-AUC of a logistic model on the top-m columns."""
-    n_feat = Xz.shape[1]
+def _fold_order(X_fit: np.ndarray, y_fit: np.ndarray) -> np.ndarray:
+    """Re-rank features on a fold's fit set (RMT prior s_i × |ρ|), as the authors do per fold."""
+    mean, scale = _zscore_fit(X_fit)
+    Xz = _zscore_apply(X_fit, mean, scale)
+    s_i, *_ = rmt_prior(Xz)
+    return np.argsort(hybrid_ranking(s_i, Xz, y_fit))[::-1]
+
+
+def _select_m(X_train: np.ndarray, y: np.ndarray, settings) -> tuple[int, float, float]:
+    """Inner CV faithful to rmt_filter.py: per-fold re-rank, StandardScaler + balanced LR, ROC-AUC.
+
+    Features are re-ranked inside each fold; for each m the top-m columns are standardised and a
+    balanced logistic model scores the validation fold. m_opt = argmax mean ROC-AUC over folds.
+    """
+    n_feat = X_train.shape[1]
     grid = sorted(set(int(m) for m in np.unique(
-        np.clip(np.round(np.linspace(2, n_feat, 60)).astype(int), 2, n_feat))))
+        np.clip(np.round(np.linspace(2, n_feat, 90)).astype(int), 2, n_feat))))
     sss = StratifiedShuffleSplit(n_splits=settings.rmt_inner_splits,
                                  train_size=settings.rmt_inner_train_frac,
                                  random_state=settings.random_state)
     scores = {m: [] for m in grid}
-    for tr, va in sss.split(Xz, y):
+    for fit, val in sss.split(X_train, y):
+        order = _fold_order(X_train[fit], y[fit])
         for m in grid:
             cols = order[:m]
-            clf = LogisticRegression(max_iter=300, C=1.0)
-            clf.fit(Xz[np.ix_(tr, cols)], y[tr])
-            p = clf.predict_proba(Xz[np.ix_(va, cols)])[:, 1]
-            scores[m].append(roc_auc_score(y[va], p))
+            scaler = StandardScaler()
+            xtr = scaler.fit_transform(np.nan_to_num(X_train[np.ix_(fit, cols)]))
+            xva = scaler.transform(np.nan_to_num(X_train[np.ix_(val, cols)]))
+            clf = LogisticRegression(max_iter=2000, solver="lbfgs", class_weight="balanced")
+            clf.fit(xtr, y[fit])
+            scores[m].append(roc_auc_score(y[val], clf.predict_proba(xva)[:, 1]))
     means = {m: float(np.mean(v)) for m, v in scores.items()}
     m_opt = max(means, key=means.get)
     return m_opt, means[m_opt], float(np.std(scores[m_opt]))
@@ -100,9 +116,9 @@ def rmt_filter(X_train: np.ndarray, y_train: np.ndarray) -> RMTResult:
     mean, scale = _zscore_fit(X_train)
     Xz = _zscore_apply(X_train, mean, scale)
     s_i, lam, q, n_signal, _, _, _ = rmt_prior(Xz)
-    rank = hybrid_ranking(s_i, Xz, y_train)
+    rank = hybrid_ranking(s_i, Xz, y_train)          # final ranking on the full train set
     order = np.argsort(rank)[::-1]
-    m_opt, auc_mean, auc_std = _select_m(Xz, y_train, order, settings)
+    m_opt, auc_mean, auc_std = _select_m(X_train, y_train, settings)   # per-fold inner CV
     return RMTResult(m_opt=m_opt, lambda_plus=lam, q=q, n_signal=n_signal, order=order,
                      selected_idx=order[:m_opt], inner_mean_auc=auc_mean,
                      inner_std_auc=auc_std, rank_scores=rank)

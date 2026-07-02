@@ -9,6 +9,9 @@ Gaussian) gives the per-compound "Probability" used to pick the >0.7 candidate s
 """
 from __future__ import annotations
 
+from functools import lru_cache
+from pathlib import Path
+
 import numpy as np
 from rdkit.Chem import Descriptors
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -19,6 +22,25 @@ from .config import get_settings
 from .dataset import DOCK_COLS, Dataset, load_rte, load_split
 
 _DESC = [(n, f) for n, f in Descriptors._descList]      # ~210 RDKit 2D descriptors
+
+
+@lru_cache(maxsize=1)
+def rdkit2d_bundled() -> np.ndarray:
+    """The authors' exact 217 RDKit2D descriptors (aligned to the dataset rows), NaN-imputed.
+
+    Falls back to on-the-fly RDKit descriptors if the bundled matrix is absent or misaligned.
+    """
+    ds = __import__("server.dataset", fromlist=["load_dataset"]).load_dataset()
+    path = Path(get_settings().fp_rdkit2d_path)
+    if path.exists():
+        X = np.load(path).astype(float)
+        if X.shape[0] != ds.n:
+            X = rdkit2d_matrix(ds.mols)
+    else:
+        X = rdkit2d_matrix(ds.mols)
+    col = np.nanmedian(np.where(np.isfinite(X), X, np.nan), axis=0)
+    col = np.where(np.isfinite(col), col, 0.0)
+    return np.where(np.isfinite(X), X, col)
 
 
 def _iid(x) -> int:
@@ -79,8 +101,8 @@ def qsar_ablation(scaffold: bool = False, split_id: str | None = None) -> dict:
     te = [_iid(i) for i in te_ids if _iid(i) in rte_idx and _iid(i) in dmap]
     y_tr = np.array([yq[i] for i in tr]); y_te = np.array([yq[i] for i in te])
 
-    # RDKit2D (aligned to dataset mols by ligand_id)
-    X2d_all = rdkit2d_matrix(ds.mols)
+    # RDKit2D (authors' exact 217-descriptor matrix, aligned to dataset rows)
+    X2d_all = rdkit2d_bundled()
     X2d_tr = X2d_all[[dmap[i] for i in tr]]; X2d_te = X2d_all[[dmap[i] for i in te]]
     dock_tr = ds.dock[[dmap[i] for i in tr]]; dock_te = ds.dock[[dmap[i] for i in te]]
 
@@ -148,6 +170,66 @@ def cb_sd_docking(scaffold: bool = False) -> dict:
     return {"all6_docking": _metrics(y_te, p), "n_train": len(tr), "n_test": len(te)}
 
 
+def _build_split(scaffold: bool, split_id: str | None):
+    """Aligned train/test arrays for a split: RDKit2D, RTE, RMT sel/rec, and labels."""
+    ds = __import__("server.dataset", fromlist=["load_dataset"]).load_dataset()
+    split = load_split(scaffold=scaffold)
+    split_id = split_id or ("scaffold_00" if scaffold else "split_00")
+    s = split[split.split_id == split_id]
+    rte_df, feat_cols = load_rte()
+    rte_idx = {_iid(l): i for i, l in enumerate(rte_df["ligand_id"].tolist())}
+    rte_arr = rte_df[feat_cols].to_numpy(float)
+    dmap = {_iid(l): i for i, l in enumerate(ds.ligand_ids)}
+    yq = {_iid(l): float(a) for l, a in zip(s.ligand_id, s.activity)}
+    tr = [_iid(i) for i in s[s.set == "train"].ligand_id if _iid(i) in rte_idx and _iid(i) in dmap]
+    te = [_iid(i) for i in s[s.set == "test"].ligand_id if _iid(i) in rte_idx and _iid(i) in dmap]
+    y_tr = np.array([yq[i] for i in tr]); y_te = np.array([yq[i] for i in te])
+    X2d = rdkit2d_bundled()
+    rt_tr = np.array([rte_arr[rte_idx[i]] for i in tr]); rt_te = np.array([rte_arr[rte_idx[i]] for i in te])
+    res = rmt.rmt_filter(rt_tr, y_tr)
+    mean, scale = rmt._zscore_fit(rt_tr)
+    _, _, _, _, eigvecs, _, signal = rmt.rmt_prior(rmt._zscore_apply(rt_tr, mean, scale))
+    rec_tr = rmt.reconstruct_signal(rt_tr, mean, scale, eigvecs, signal)[:, res.selected_idx]
+    rec_te = rmt.reconstruct_signal(rt_te, mean, scale, eigvecs, signal)[:, res.selected_idx]
+    return {"X2d_tr": X2d[[dmap[i] for i in tr]], "X2d_te": X2d[[dmap[i] for i in te]],
+            "rt_tr": rt_tr, "rt_te": rt_te, "rec_tr": rec_tr, "rec_te": rec_te,
+            "y_tr": y_tr, "y_te": y_te, "m_opt": res.m_opt}
+
+
+def cb_sd_rte(scaffold: bool = False) -> dict:
+    """CB-SD analogue: gradient boosting on the 390 residue-term energies (paper ALL6 ~0.802)."""
+    d = _build_split(scaffold, None)
+    p = _fit_predict(np.nan_to_num(d["rt_tr"]), d["y_tr"], np.nan_to_num(d["rt_te"]))
+    return {"all6_rte": _metrics(d["y_te"], p), "n_train": len(d["y_tr"]), "n_test": len(d["y_te"])}
+
+
+def docking_veto(scaffold: bool = False, threshold: float = 0.5) -> dict:
+    """Docking-consistency veto (Section 3.3): p_final = p_QSAR × p_RMT-RTE reduces false positives.
+
+    The structure model (RDKit2D HGB, DMPNN-SD analogue) gives p_qsar; an independent
+    RMT-RTE model gives p_rmt; their product can only *lower* the probability (a soft physical
+    consistency filter), cutting the false-positive rate at the 0.5 operating point.
+    """
+    d = _build_split(scaffold, None)
+    p_qsar = _fit_predict(d["X2d_tr"], d["y_tr"], d["X2d_te"])
+    p_rmt = _fit_predict(np.nan_to_num(d["rec_tr"]), d["y_tr"], np.nan_to_num(d["rec_te"]))
+    p_final = p_qsar * p_rmt
+    y = d["y_te"]; neg = y == 0; pos = y == 1
+
+    def fpr(p):
+        return float(((p[neg] >= threshold).sum()) / max(neg.sum(), 1))
+
+    def recall(p):
+        return float(((p[pos] >= threshold).sum()) / max(pos.sum(), 1))
+    return {
+        "roc_auc_qsar": round(float(roc_auc_score(y, p_qsar)), 4),
+        "roc_auc_after_veto": round(float(roc_auc_score(y, p_final)), 4),
+        "fpr_before": round(fpr(p_qsar), 4), "fpr_after_veto": round(fpr(p_final), 4),
+        "fpr_reduction_pct": round(100 * (fpr(p_qsar) - fpr(p_final)) / max(fpr(p_qsar), 1e-9), 1),
+        "recall_before": round(recall(p_qsar), 4), "recall_after_veto": round(recall(p_final), 4),
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Applicability domain + biopesticide prediction (Section 3.4).
 # --------------------------------------------------------------------------- #
@@ -168,7 +250,7 @@ def predict_biopesticides() -> dict:
     ds = __import__("server.dataset", fromlist=["load_dataset"]).load_dataset()
     settings = get_settings()
     lab = ds.labelled_mask; meta = ds.metabolite_mask
-    X = rdkit2d_matrix(ds.mols)
+    X = rdkit2d_bundled()
     clf = _hgb(); clf.fit(X[lab], ds.activity[lab])
     proba = clf.predict_proba(X[meta])[:, 1]
 
