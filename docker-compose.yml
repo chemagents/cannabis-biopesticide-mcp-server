@@ -1,0 +1,11 @@
+services:
+  cannabis-biopesticide-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cannabis-biopesticide-mcp-server
+    environment:
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "7337:7331"   # host 7337 -> container 7331 (matches the CoScientist stack)
+    restart: unless-stopped

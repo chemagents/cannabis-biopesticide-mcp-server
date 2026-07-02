@@ -1,0 +1,23 @@
+FROM python:3.12-slim
+
+# RDKit / scientific stack runtime libs (slim image omits these).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libxrender1 \
+    libxext6 \
+    libgomp1 \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN pip install uv
+
+# Build context is the repo root (mcp-servers/docker-compose.yml uses context: ..).
+COPY mcp-servers/cannabis-biopesticide-mcp-server/pyproject.toml mcp-servers/cannabis-biopesticide-mcp-server/README.md ./
+RUN uv sync --no-install-project
+
+COPY mcp-servers/cannabis-biopesticide-mcp-server/server ./server
+
+ENV UV_SYSTEM_PYTHON=1
+EXPOSE 7331
+
+CMD ["uv", "run", "--no-project", "python", "-m", "server.canpest_server"]

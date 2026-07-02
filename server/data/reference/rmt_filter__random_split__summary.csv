@@ -1,0 +1,2 @@
+split_id,target_type,n_train,n_test,n_features_total,m_opt,n_selected,inner_metric,inner_mean_score_at_m_opt,inner_std_score_at_m_opt,lambda_plus,q,n_signal_raw,n_signal_used
+split_00,binary,2536,635,390,161,161,roc_auc,0.7472205664222243,0.02853185005391626,1.9380953485399866,0.15378548895899052,19,19

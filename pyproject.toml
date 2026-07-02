@@ -1,0 +1,46 @@
+[project]
+name = "cannabis-biopesticide-mcp-server"
+version = "0.1.0"
+description = "MCP server reproducing the docking-informed, RMT-denoised biopesticide QSAR of the Cannabis sativa metabolome"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "fastmcp>=2.14.5",
+    "pydantic-settings>=2.0",
+    "rdkit>=2024.3",
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "scikit-learn>=1.3",
+    "catboost>=1.2",
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "joblib>=1.3",
+    "boto3>=1.34",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[project.optional-dependencies]
+# Exact DMPNN reproduction (heavy, torch). The default HGB backend reproduces ROC-AUC ~0.93
+# without torch, so this is optional.
+dmpnn = ["torch>=2.2"]
+
+[project.scripts]
+cannabis-biopesticide-mcp-server = "server.canpest_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["server"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"server/data/canpest_data.csv" = "server/data/canpest_data.csv"
+"server/data/rte.csv" = "server/data/rte.csv"
+"server/data/split_registry.csv" = "server/data/split_registry.csv"
+"server/data/split_registry_scaffold.csv" = "server/data/split_registry_scaffold.csv"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+markers = ["slow: long-running reproduction tests (RMT inner-CV, model training)"]
