@@ -38,17 +38,24 @@ def test_metabolite_docking_range():
 def test_rmt_lambda_plus_and_m_opt():
     r = models.rmt_selection(scaffold=False)
     assert abs(r["lambda_plus"] - 1.938) < 0.01           # Marchenko-Pastur threshold, exact
-    assert 120 <= r["m_opt"] <= 200                       # paper m_opt = 161
-    assert abs(r["inner_auc"] - 0.747) < 0.03
+    assert 145 <= r["m_opt"] <= 175                       # paper m_opt = 161
+    assert abs(r["inner_auc"] - 0.747) < 0.02
 
 
 @pytest.mark.slow
 def test_qsar_high_quality():
-    ab = models.qsar_ablation(scaffold=False)
+    ab = models.qsar_ablation(scaffold=False)              # authors' exact 217 descriptors
     best = max(m["roc_auc"] for m in ab["results"].values())
-    assert best >= 0.90                                   # paper DMPNN-SD ~0.928
-    cb = models.cb_sd_docking()["all6_docking"]["roc_auc"]
-    assert 0.64 <= cb <= 0.83                             # paper CB-SD 0.68-0.80
+    assert best >= 0.92                                   # paper DMPNN-SD 0.9283
+    cb = models.cb_sd_rte()["all6_rte"]["roc_auc"]
+    assert 0.75 <= cb <= 0.83                             # paper CB-SD ALL6 0.802
+
+
+@pytest.mark.slow
+def test_docking_veto_reduces_fpr():
+    v = models.docking_veto()
+    assert v["fpr_after_veto"] < 0.08                     # paper 4.92%
+    assert v["fpr_reduction_pct"] >= 40                   # paper ~60%
 
 
 @pytest.mark.slow

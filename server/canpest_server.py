@@ -85,22 +85,37 @@ def rmt_feature_selection(scaffold_split: bool = False) -> dict:
 
 @mcp.tool()
 def qsar_model_quality(scaffold_split: bool = False) -> dict:
-    """QSAR quality: RDKit2D + docking/RMT feature-set ablation, and the docking-only baseline (Section 3.3)."""
+    """QSAR quality: RDKit2D+RMT ablation, residue-level docking baseline (CB-SD) (Section 3.3)."""
     ab = models.qsar_ablation(scaffold=scaffold_split)
-    cb = models.cb_sd_docking(scaffold=scaffold_split)
+    cb = models.cb_sd_rte(scaffold=scaffold_split)
     best = max(ab["results"].items(), key=lambda kv: kv[1]["roc_auc"])
     return {
         "answer": {
             "ablation": ab["results"], "best_feature_set": best[0], "best_roc_auc": best[1]["roc_auc"],
-            "docking_only_baseline": cb["all6_docking"],
+            "cb_sd_residue_level_docking": cb["all6_rte"],
             "m_opt": ab["m_opt"],
-            "finding": f"Structure-based HGB (open analogue of DMPNN-SD) reaches ROC-AUC "
-                       f"~{best[1]['roc_auc']:.2f}; docking-only features carry a weaker but real "
-                       f"signal (ROC-AUC {cb['all6_docking']['roc_auc']:.2f}).",
+            "finding": f"Structure-based gradient boosting on the authors' 217 RDKit2D descriptors "
+                       f"(open analogue of DMPNN-SD) reaches ROC-AUC ~{best[1]['roc_auc']:.3f}; the "
+                       f"residue-level docking model (CB-SD) reaches {cb['all6_rte']['roc_auc']:.3f}.",
         },
         "metadata": {"paper": reference.QSAR, "reference": PAPER,
-                     "note": "DMPNN-SD (torch) reproduces exactly; the default HGB backend is "
-                             "torch-free and lands ~0.92-0.93 (paper 0.928)."},
+                     "note": "Exact DMPNN-SD available via the vendored torch pipeline (server/vendor); "
+                             "the default HGB backend is torch-free and lands ~0.93 (paper 0.928)."},
+    }
+
+
+@mcp.tool()
+def docking_veto() -> dict:
+    """Docking-consistency veto: p_final = p_QSAR × p_RMT-RTE cuts the false-positive rate (Section 3.3)."""
+    v = models.docking_veto()
+    return {
+        "answer": {**v,
+                   "finding": f"The asymmetric veto lowers FPR from {v['fpr_before']:.1%} to "
+                              f"{v['fpr_after_veto']:.1%} ({v['fpr_reduction_pct']:.0f}% reduction) at "
+                              f"threshold 0.5, trading recall ({v['recall_before']:.2f}→"
+                              f"{v['recall_after_veto']:.2f}) — a physical-consistency filter, not an average."},
+        "metadata": {"paper": {"fpr_before": reference.QSAR["fpr_before"],
+                               "fpr_after_veto": reference.QSAR["fpr_after_veto"]}, "reference": PAPER},
     }
 
 
@@ -165,7 +180,8 @@ def reproduce_all() -> dict:
     dk = docking.active_vs_inactive(ds)
     rmt_res = models.rmt_selection(scaffold=False)
     ab = models.qsar_ablation(scaffold=False)
-    cb = models.cb_sd_docking(scaffold=False)
+    cb = models.cb_sd_rte(scaffold=False)
+    veto = models.docking_veto()
     cand = models.predict_biopesticides()
 
     neg = [r for r in dk["per_protein"] if r["expected_trend"]]
@@ -178,10 +194,13 @@ def reproduce_all() -> dict:
         ("rmt_lambda_plus", rmt_res["lambda_plus"], reference.RMT["lambda_plus"],
          abs(rmt_res["lambda_plus"] - 1.938) < 0.01),
         ("rmt_m_opt", rmt_res["m_opt"], reference.RMT["m_opt_random"],
-         abs(rmt_res["m_opt"] - 161) <= 40),
-        ("qsar_roc_auc_high", round(best_roc, 3), "~0.93", best_roc >= 0.90),
-        ("cb_sd_docking_in_range", cb["all6_docking"]["roc_auc"], reference.QSAR["cb_sd_range"],
-         0.64 <= cb["all6_docking"]["roc_auc"] <= 0.83),
+         abs(rmt_res["m_opt"] - 161) <= 15),
+        ("qsar_roc_auc", round(best_roc, 3), reference.QSAR["dmpnn_sd_roc"], best_roc >= 0.92),
+        ("cb_sd_residue_docking", cb["all6_rte"]["roc_auc"], reference.QSAR["cb_sd_all6"],
+         0.75 <= cb["all6_rte"]["roc_auc"] <= 0.83),
+        ("docking_veto_fpr_reduction", f"{veto['fpr_before']:.3f}->{veto['fpr_after_veto']:.3f}",
+         f"{reference.QSAR['fpr_before']}->{reference.QSAR['fpr_after_veto']}",
+         veto["fpr_after_veto"] < 0.08 and veto["fpr_reduction_pct"] >= 40),
         ("biopesticide_candidates_fraction", cand["candidate_fraction"], reference.CANDIDATES["fraction"],
          0.30 <= cand["candidate_fraction"] <= 0.50),
     ]
@@ -203,7 +222,8 @@ def reproduce_claims() -> dict:
     dk = docking.active_vs_inactive(ds)
     rmt_res = models.rmt_selection(scaffold=False)
     ab = models.qsar_ablation(scaffold=False)
-    cb = models.cb_sd_docking(scaffold=False)
+    cb = models.cb_sd_rte(scaffold=False)
+    veto = models.docking_veto()
     cand = models.predict_biopesticides()
     best_roc = max(m["roc_auc"] for m in ab["results"].values())
 
@@ -223,10 +243,19 @@ def reproduce_claims() -> dict:
                                  f"{rmt_res['n_signal']} signal eigenvalues.",
          "reproduced": abs(rmt_res["lambda_plus"] - 1.938) < 0.01},
         {"id": "C3", "question": "How good is the biopesticide QSAR model?",
-         "paper_assertion": "DMPNN-SD reaches ROC-AUC ~0.93; docking-only models 0.68–0.80.",
-         "reproduced_statement": f"Reproduced: structure-based HGB ROC-AUC {best_roc:.3f}; docking-only "
-                                 f"ROC-AUC {cb['all6_docking']['roc_auc']:.3f}.",
-         "reproduced": best_roc >= 0.90 and 0.64 <= cb["all6_docking"]["roc_auc"] <= 0.83},
+         "paper_assertion": "DMPNN-SD reaches ROC-AUC 0.9283; residue-level docking models (CB-SD) "
+                            "reach 0.68–0.80.",
+         "reproduced_statement": f"Reproduced: structure-based GBM ROC-AUC {best_roc:.3f} (paper 0.928); "
+                                 f"CB-SD residue-level docking ROC-AUC {cb['all6_rte']['roc_auc']:.3f} "
+                                 f"(paper 0.802).",
+         "reproduced": best_roc >= 0.92 and 0.75 <= cb["all6_rte"]["roc_auc"] <= 0.83},
+        {"id": "C_veto", "question": "Does the docking-consistency veto cut false positives?",
+         "paper_assertion": "p_final = p_DMPNN × p_RMT-RTE lowers FPR from 12.20% to 4.92% (~60%) while "
+                            "keeping ROC-AUC high.",
+         "reproduced_statement": f"Reproduced: FPR {veto['fpr_before']:.1%}→{veto['fpr_after_veto']:.1%} "
+                                 f"({veto['fpr_reduction_pct']:.0f}% reduction), ROC-AUC "
+                                 f"{veto['roc_auc_qsar']}→{veto['roc_auc_after_veto']}.",
+         "reproduced": veto["fpr_after_veto"] < 0.08 and veto["fpr_reduction_pct"] >= 40},
         {"id": "C4", "question": "How many C. sativa metabolites are candidate biopesticides?",
          "paper_assertion": "1010 metabolites (40.97%) have pesticide probability >0.7.",
          "reproduced_statement": f"Reproduced: {cand['candidates_prob_gt_0.7']} metabolites "

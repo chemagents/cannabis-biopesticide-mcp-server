@@ -35,6 +35,7 @@ packages = ["server"]
 [tool.hatch.build.targets.wheel.force-include]
 "server/data/canpest_data.csv" = "server/data/canpest_data.csv"
 "server/data/rte.csv" = "server/data/rte.csv"
+"server/data/fp_rdkit2d.npy" = "server/data/fp_rdkit2d.npy"
 "server/data/split_registry.csv" = "server/data/split_registry.csv"
 "server/data/split_registry_scaffold.csv" = "server/data/split_registry_scaffold.csv"
 
