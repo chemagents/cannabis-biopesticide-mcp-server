@@ -122,7 +122,7 @@ def featurize_fragments(mols):
 # --------------------------------------------------------------------------- #
 def make_catboost(task):
     common = dict(iterations=1000, depth=6, learning_rate=0.05,
-                  random_seed=SEED, verbose=0, thread_count=-1)
+                  random_seed=SEED, verbose=0, thread_count=-1, allow_writing_files=False)
     if task == "classification":
         return CatBoostClassifier(loss_function="Logloss", **common)
     return CatBoostRegressor(loss_function="RMSE", **common)

@@ -43,7 +43,7 @@ def score(y, p, task):
 
 def bases(task):
     C = task == "classification"
-    def cat(**k): return (CatBoostClassifier if C else CatBoostRegressor)(random_seed=SEED, verbose=0, thread_count=-1, **k)
+    def cat(**k): return (CatBoostClassifier if C else CatBoostRegressor)(random_seed=SEED, verbose=0, thread_count=-1, allow_writing_files=False, **k)
     def xgb(**k): return (XGBClassifier if C else XGBRegressor)(random_state=SEED, n_jobs=-1, tree_method="hist", **k)
     def lgbm(**k): return (LGBMClassifier if C else LGBMRegressor)(random_state=SEED, n_jobs=-1, verbose=-1, **k)
     def xt(**k): return (ExtraTreesClassifier if C else ExtraTreesRegressor)(random_state=SEED, n_jobs=-1, **k)
