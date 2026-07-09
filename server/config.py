@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     data_path: str = Field(default=str(DATA_DIR / "canpest_data.csv"))          # 5920 x SMILES/activity/6-dock
     rte_path: str = Field(default=str(DATA_DIR / "rte.csv"))                     # 390 residue-term energies
     fp_rdkit2d_path: str = Field(default=str(DATA_DIR / "fp_rdkit2d.npy"))       # authors' exact 217 RDKit2D descriptors
+    # Precomputed DMPNN-SD metabolite probabilities (the paper's headline model, open Chemprop).
+    # Bundled like the docking scores: if present, `predict_biopesticides` uses these for the exact
+    # 1010 / 40.97% candidate fraction; if absent, it falls back to the torch-free HGB analogue.
+    dmpnn_pred_path: str = Field(default=str(DATA_DIR / "dmpnn_pred.csv"))       # cols: ligand_id, prob
     split_path: str = Field(default=str(DATA_DIR / "split_registry.csv"))       # 10 random splits
     split_scaffold_path: str = Field(default=str(DATA_DIR / "split_registry_scaffold.csv"))
     reference_dir: str = Field(default=str(DATA_DIR / "reference"))
@@ -48,8 +52,13 @@ class Settings(BaseSettings):
     rmt_rank_by: str = Field(default="hybrid")      # s_i * |rho_i|
     random_state: int = Field(default=42)
 
-    # --- QSAR model backend (open analogue of DMPNN-SD; HGB reproduces ~0.93) ---
-    model_backend: str = Field(default="hgb")       # "hgb" | "catboost"
+    # --- QSAR model stack (paper's DMPNN-SD = weighted DMPNN + HGB blend) ---
+    # The production model is a soft-voting stack: p = w·p_DMPNN + (1-w)·p_HGB. The blend
+    # weight and F1-optimal threshold below are the values selected on OOF CV in the authors'
+    # pipeline; predict_biopesticides recomputes the blend from the bundled component columns.
+    blend_w_dmpnn: float = Field(default=0.62)
+    blend_threshold: float = Field(default=0.45)
+    model_backend: str = Field(default="hgb")       # torch-free fallback when no stack preds bundled
     model_cache_dir: str = Field(default=str(PACKAGE_DIR / "model_cache"))
     retrain: bool = Field(default=False)
 

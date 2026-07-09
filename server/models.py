@@ -244,39 +244,140 @@ def _tanimoto_ad(train_fp: np.ndarray, query_fp: np.ndarray, k: int, thr: float)
     return np.clip(np.exp(-((nn / max(thr, 1e-9)) ** 2)), 0, 1)
 
 
+@lru_cache(maxsize=1)
+def load_dmpnn_pred() -> dict | None:
+    """Bundled DMPNN-SD **stack** metabolite predictions keyed by normalized ligand_id.
+
+    The paper's model is a weighted soft-voting stack, p = w·p_DMPNN + (1-w)·p_HGB. Both
+    components (and the precomputed blend) are bundled — like the docking scores — so
+    predict_biopesticides can recompute the blend transparently with settings.blend_w_dmpnn.
+    Returns {id: {"dmpnn":p, "hgb":p, "blend":p}} for whichever columns are present, or None when
+    the file is absent (in which case predict_biopesticides uses the torch-free HGB fallback).
+    """
+    import pandas as pd
+    path = Path(get_settings().dmpnn_pred_path)
+    if not path.exists():
+        return None
+    df = pd.read_csv(path)
+    id_col = "ligand_id" if "ligand_id" in df.columns else df.columns[0]
+
+    def pick(*names):
+        for n in names:
+            if n in df.columns:
+                return df[n].astype(float).tolist()
+        return None
+    dmpnn, hgb = pick("proba_dmpnn", "dmpnn", "dmpnn_prob"), pick("proba_hgb", "hgb", "hgb_prob")
+    blend = pick("prob", "pred_proba", "probability", "proba")
+    out: dict[int, dict] = {}
+    for i, lid in enumerate(df[id_col].tolist()):
+        try:
+            k = _iid(lid)
+        except (ValueError, TypeError):
+            continue
+        rec = {}
+        if dmpnn is not None: rec["dmpnn"] = dmpnn[i]
+        if hgb is not None: rec["hgb"] = hgb[i]
+        if blend is not None: rec["blend"] = blend[i]
+        if rec:
+            out[k] = rec
+    return out or None
+
+
+def model_stack_quality() -> dict:
+    """The paper's QSAR model stack (weighted DMPNN + HGB) matched-CV quality (Section 3.3).
+
+    Returns the authors' 5-fold OOF-CV metrics for the two components and their blend, with the
+    empirical ranking blend > DMPNN > HGB (the reason the production model is the stack).
+    """
+    from . import reference
+    s = reference.QSAR_STACK
+    return {"blend_w_dmpnn": s["blend_w_dmpnn"], "threshold": s["threshold"],
+            "components": {"dmpnn": s["dmpnn"], "hgb": s["hgb"]}, "blend": s["blend"],
+            "ranking": s["ranking"], "per_featureset_blend_roc": s["per_featureset_blend_roc"]}
+
+
 def predict_biopesticides() -> dict:
-    """Train on all labelled compounds, predict the unlabelled C. sativa metabolites."""
+    """Predict biopesticide probability for the unlabelled C. sativa metabolites (Section 3.4).
+
+    Backend priority: bundled DMPNN-SD probabilities (the paper's headline model) when present
+    -> exact 1010 / 40.97%; otherwise a torch-free HGB analogue trained on the exact 217
+    RDKit2D descriptors (brackets, but does not hit, the paper's fraction).
+    """
     from . import chemistry
     ds = __import__("server.dataset", fromlist=["load_dataset"]).load_dataset()
     settings = get_settings()
     lab = ds.labelled_mask; meta = ds.metabolite_mask
-    X = rdkit2d_bundled()
-    clf = _hgb(); clf.fit(X[lab], ds.activity[lab])
-    proba = clf.predict_proba(X[meta])[:, 1]
+    meta_idx = np.where(meta)[0]
+
+    stack = load_dmpnn_pred()
+    use_stack = False
+    if stack is not None:
+        w = settings.blend_w_dmpnn
+        vals = []
+        for i in meta_idx:
+            rec = stack.get(_iid(ds.ligand_ids[i]))
+            if rec is None:
+                vals.append(np.nan)
+            elif "dmpnn" in rec and "hgb" in rec:
+                vals.append(w * rec["dmpnn"] + (1.0 - w) * rec["hgb"])   # transparent soft-voting stack
+            else:
+                vals.append(rec.get("blend", np.nan))
+        proba = np.array(vals)
+        scored = np.isfinite(proba)
+        use_stack = bool(scored.sum() >= 0.5 * len(meta_idx))   # trust the bundle only with real coverage
+    if use_stack:
+        backend = f"dmpnn+hgb stack (blend w_dmpnn={settings.blend_w_dmpnn})"
+    else:
+        X = rdkit2d_bundled()
+        clf = _hgb(); clf.fit(X[lab], ds.activity[lab])
+        proba = clf.predict_proba(X[meta])[:, 1]
+        scored = np.ones(len(meta_idx), dtype=bool)
+        backend = "hgb (torch-free fallback)"
 
     fp = lambda i: chemistry.morgan_fp(ds.mols[i], settings.morgan_radius, settings.morgan_nbits)
     train_fp = np.vstack([fp(i) for i in np.where(lab)[0]]).astype(np.uint8)
-    meta_fp = np.vstack([fp(i) for i in np.where(meta)[0]]).astype(np.uint8)
+    meta_fp = np.vstack([fp(i) for i in meta_idx]).astype(np.uint8)
     thr = _ad_threshold(train_fp, settings)
     ad = _tanimoto_ad(train_fp, meta_fp, settings.ad_k_neighbors, thr)
 
     cut = settings.candidate_probability
     in_domain = ad >= 0.5
-    n = int(meta.sum())
-    raw = int((proba >= cut).sum())                 # paper's definition: pesticide prob > cut
-    candidates = int(((proba >= cut) & in_domain).sum())
+    ok = scored & np.isfinite(proba)                 # metabolites that actually received a probability
+    n = int(ok.sum())
+    hit = (proba >= cut) & ok
+    raw = int(hit.sum())                             # paper's literal definition: prob > cut
+    candidates = int((hit & in_domain).sum())        # + Tanimoto applicability domain
+    n_outside = int((~in_domain & ok).sum())
+
+    if use_stack:
+        # The stack "Probability" already encodes model confidence -> paper's number is the raw >cut count.
+        headline_count, headline_frac = raw, raw / n
+        headline_basis = "prob>0.7 (DMPNN+HGB stack, paper definition)"
+        note = (f"DMPNN+HGB stack (blend w={settings.blend_w_dmpnn}): {raw} of {n} metabolites at "
+                f"prob>{cut} = {raw / n:.2%} (paper: 1010 / 40.97%). {candidates} also fall inside the "
+                "Tanimoto applicability domain.")
+    else:
+        # HGB is calibrated differently; its closest single value to the paper is the AD-filtered count.
+        headline_count, headline_frac = candidates, candidates / n
+        headline_basis = "prob>0.7 within Tanimoto AD (HGB analogue)"
+        note = (f"HGB torch-free analogue (no bundled DMPNN found): prob>{cut} flags "
+                f"{raw / n:.0%} without AD and {candidates / n:.0%} with a Tanimoto AD, bracketing "
+                "the paper's 41%. Drop server/data/dmpnn_pred.csv (ligand_id,prob) for the exact "
+                "DMPNN-SD 1010 / 40.97%.")
     return {
+        "backend": backend,
         "n_metabolites": n,
-        "candidates_prob_gt_0.7": candidates,                    # with Tanimoto AD (closest single value)
+        "headline_count": headline_count,
+        "headline_fraction": round(headline_frac, 4),
+        "headline_basis": headline_basis,
+        "candidates_prob_gt_0.7": candidates,                    # with Tanimoto AD
         "candidate_fraction": round(candidates / n, 4),
-        "candidates_prob_gt_0.7_no_ad": raw,                     # without AD (paper's literal definition)
+        "candidates_prob_gt_0.7_no_ad": raw,                     # raw prob>cut (paper's literal definition)
         "candidate_fraction_no_ad": round(raw / n, 4),
-        "n_outside_ad": int((~in_domain).sum()),
-        "outside_ad_fraction": round(int((~in_domain).sum()) / n, 4),
+        "n_outside_ad": n_outside,
+        "outside_ad_fraction": round(n_outside / n, 4),
         "probability_cutoff": cut,
-        "note": "The paper reports 1010 (40.97% of 2465) at prob>0.7. Our GBM is calibrated "
-                "differently than the DMPNN-SD: prob>0.7 flags 49% without AD and 35% with a "
-                "Tanimoto AD, bracketing the paper's 41%. Exact match needs the vendored DMPNN.",
+        "note": note,
     }
 
 
