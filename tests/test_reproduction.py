@@ -61,4 +61,7 @@ def test_docking_veto_reduces_fpr():
 @pytest.mark.slow
 def test_candidate_fraction():
     res = models.predict_biopesticides()
-    assert 0.30 <= res["candidate_fraction"] <= 0.50      # paper 40.97%
+    # headline_fraction is the paper-comparable number for whichever backend is active:
+    # DMPNN-SD -> exact 40.97% (raw prob>0.7); HGB fallback -> ~34% (prob>0.7 within Tanimoto AD).
+    assert 0.30 <= res["headline_fraction"] <= 0.50       # paper 40.97%
+    assert res["backend"].startswith(("dmpnn", "hgb"))

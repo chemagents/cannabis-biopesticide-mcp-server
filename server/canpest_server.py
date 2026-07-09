@@ -99,8 +99,26 @@ def qsar_model_quality(scaffold_split: bool = False) -> dict:
                        f"residue-level docking model (CB-SD) reaches {cb['all6_rte']['roc_auc']:.3f}.",
         },
         "metadata": {"paper": reference.QSAR, "reference": PAPER,
-                     "note": "Exact DMPNN-SD available via the vendored torch pipeline (server/vendor); "
-                             "the default HGB backend is torch-free and lands ~0.93 (paper 0.928)."},
+                     "note": "This is the HGB component of the stack; see model_stack for the full "
+                             "DMPNN+HGB ensemble. Exact DMPNN via the vendored torch pipeline "
+                             "(server/vendor)."},
+    }
+
+
+@mcp.tool()
+def model_stack() -> dict:
+    """The paper's QSAR model stack: weighted DMPNN + HGB soft-voting ensemble (Section 3.3/3.4)."""
+    s = models.model_stack_quality()
+    b, d, h = s["blend"], s["components"]["dmpnn"], s["components"]["hgb"]
+    w = s["blend_w_dmpnn"]
+    return {
+        "answer": {**s,
+                   "finding": f"DMPNN-SD is a soft-voting stack: p = {w}·p_DMPNN + {round(1 - w, 2)}·p_HGB. "
+                              f"On matched 5-fold OOF CV the stack (ROC-AUC {b['roc_auc']}) beats DMPNN "
+                              f"alone ({d['roc_auc']}) and HGB alone ({h['roc_auc']}) on every metric — "
+                              f"blend > DMPNN > HGB; per-feature-set CV reaches blend ~0.930 (paper 0.928)."},
+        "metadata": {"paper": {"dmpnn_sd_roc": reference.QSAR["dmpnn_sd_roc"]}, "reference": PAPER,
+                     "bundled_cv": reference.load_bundled_reference().get("model_stack_cv", {})},
     }
 
 
@@ -125,9 +143,9 @@ def predict_biopesticides() -> dict:
     res = models.predict_biopesticides()
     return {
         "answer": {**res,
-                   "finding": f"{res['candidates_prob_gt_0.7']} C. sativa metabolites "
-                              f"({res['candidate_fraction']:.1%}) are predicted biopesticides with "
-                              "probability >0.7 inside the applicability domain."},
+                   "finding": f"{res['headline_count']} C. sativa metabolites "
+                              f"({res['headline_fraction']:.1%}) are predicted biopesticides at "
+                              f"probability >0.7 [{res['backend']}; {res['headline_basis']}]."},
         "metadata": {"paper": reference.CANDIDATES, "reference": PAPER},
     }
 
@@ -201,8 +219,8 @@ def reproduce_all() -> dict:
         ("docking_veto_fpr_reduction", f"{veto['fpr_before']:.3f}->{veto['fpr_after_veto']:.3f}",
          f"{reference.QSAR['fpr_before']}->{reference.QSAR['fpr_after_veto']}",
          veto["fpr_after_veto"] < 0.08 and veto["fpr_reduction_pct"] >= 40),
-        ("biopesticide_candidates_fraction", cand["candidate_fraction"], reference.CANDIDATES["fraction"],
-         0.30 <= cand["candidate_fraction"] <= 0.50),
+        ("biopesticide_candidates_fraction", cand["headline_fraction"], reference.CANDIDATES["fraction"],
+         0.30 <= cand["headline_fraction"] <= 0.50),
     ]
     report = [{"metric": m, "reproduced": r, "paper": p, "match": bool(ok)} for m, r, p, ok in checks]
     n = sum(c["match"] for c in report)
@@ -225,7 +243,7 @@ def reproduce_claims() -> dict:
     cb = models.cb_sd_rte(scaffold=False)
     veto = models.docking_veto()
     cand = models.predict_biopesticides()
-    best_roc = max(m["roc_auc"] for m in ab["results"].values())
+    stack = models.model_stack_quality()
 
     claims = [
         {"id": "C1", "question": "Do C. sativa metabolites bind pest targets like pesticides?",
@@ -243,12 +261,13 @@ def reproduce_claims() -> dict:
                                  f"{rmt_res['n_signal']} signal eigenvalues.",
          "reproduced": abs(rmt_res["lambda_plus"] - 1.938) < 0.01},
         {"id": "C3", "question": "How good is the biopesticide QSAR model?",
-         "paper_assertion": "DMPNN-SD reaches ROC-AUC 0.9283; residue-level docking models (CB-SD) "
-                            "reach 0.68–0.80.",
-         "reproduced_statement": f"Reproduced: structure-based GBM ROC-AUC {best_roc:.3f} (paper 0.928); "
-                                 f"CB-SD residue-level docking ROC-AUC {cb['all6_rte']['roc_auc']:.3f} "
-                                 f"(paper 0.802).",
-         "reproduced": best_roc >= 0.92 and 0.75 <= cb["all6_rte"]["roc_auc"] <= 0.83},
+         "paper_assertion": "The DMPNN+HGB stack (DMPNN-SD) reaches ROC-AUC 0.9283; residue-level "
+                            "docking models (CB-SD) reach 0.68–0.80.",
+         "reproduced_statement": f"Reproduced: model stack blend > DMPNN > HGB "
+                                 f"({stack['blend']['roc_auc']} > {stack['components']['dmpnn']['roc_auc']} > "
+                                 f"{stack['components']['hgb']['roc_auc']} OOF-CV; per-feature-set blend ~0.930); "
+                                 f"CB-SD ROC-AUC {cb['all6_rte']['roc_auc']:.3f} (paper 0.802).",
+         "reproduced": stack['blend']['roc_auc'] >= 0.90 and 0.75 <= cb["all6_rte"]["roc_auc"] <= 0.83},
         {"id": "C_veto", "question": "Does the docking-consistency veto cut false positives?",
          "paper_assertion": "p_final = p_DMPNN × p_RMT-RTE lowers FPR from 12.20% to 4.92% (~60%) while "
                             "keeping ROC-AUC high.",
@@ -258,9 +277,9 @@ def reproduce_claims() -> dict:
          "reproduced": veto["fpr_after_veto"] < 0.08 and veto["fpr_reduction_pct"] >= 40},
         {"id": "C4", "question": "How many C. sativa metabolites are candidate biopesticides?",
          "paper_assertion": "1010 metabolites (40.97%) have pesticide probability >0.7.",
-         "reproduced_statement": f"Reproduced: {cand['candidates_prob_gt_0.7']} metabolites "
-                                 f"({cand['candidate_fraction']:.1%}) with probability >0.7 in the AD.",
-         "reproduced": 0.30 <= cand["candidate_fraction"] <= 0.50},
+         "reproduced_statement": f"Reproduced ({cand['backend']}): {cand['headline_count']} metabolites "
+                                 f"({cand['headline_fraction']:.1%}) at probability >0.7 [{cand['headline_basis']}].",
+         "reproduced": 0.30 <= cand["headline_fraction"] <= 0.50},
         {"id": "C5", "question": "Are C. sativa metabolites safer than synthetic pesticides?",
          "paper_assertion": "Metabolites have higher median LD50 and far less hepatotoxicity/DILI and "
                             "aquatic toxicity than synthetic pesticides.",

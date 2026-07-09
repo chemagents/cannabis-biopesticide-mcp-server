@@ -38,6 +38,7 @@ packages = ["server"]
 "server/data/fp_rdkit2d.npy" = "server/data/fp_rdkit2d.npy"
 "server/data/split_registry.csv" = "server/data/split_registry.csv"
 "server/data/split_registry_scaffold.csv" = "server/data/split_registry_scaffold.csv"
+"server/data/dmpnn_pred.csv" = "server/data/dmpnn_pred.csv"
 
 [build-system]
 requires = ["hatchling"]

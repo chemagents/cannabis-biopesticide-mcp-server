@@ -23,6 +23,20 @@ QSAR = {"cb_sd_range": [0.679, 0.775], "svm_sd_range": [0.642, 0.754], "cb_sd_al
         "dmpnn_sd_roc": 0.9283, "fpr_before": 0.1220, "fpr_after_veto": 0.0492,
         "roc_after_veto": 0.9176}
 
+# DMPNN-SD is a weighted stack (soft-voting ensemble) of a D-MPNN graph net and an HGB model on
+# RDKit-2D + engineered docking features. Numbers below are the authors' matched 5-fold OOF CV on
+# the 3171 labelled compounds (feature_set dock_eng+rdkit) — the blend beats either component on
+# every metric. Per-feature-set CV baselines reach blend ROC-AUC ~0.930 (≈ the paper's 0.9283).
+QSAR_STACK = {
+    "blend_w_dmpnn": 0.62, "threshold": 0.45,
+    "dmpnn": {"roc_auc": 0.9087, "pr_auc": 0.9268, "f1": 0.8531, "bal_acc": 0.8436},
+    "hgb":   {"roc_auc": 0.8995, "pr_auc": 0.9190, "f1": 0.8396, "bal_acc": 0.8281},
+    "blend": {"roc_auc": 0.9142, "pr_auc": 0.9326, "f1": 0.8578, "bal_acc": 0.8509},
+    "ranking": "blend > dmpnn > hgb",
+    "per_featureset_blend_roc": {"rmt_rte_rdkit_only": 0.9313, "rmt_rte_integration": 0.9300,
+                                 "rmt_rte_global_dock": 0.9317},
+}
+
 # Section 3.4 candidates
 CANDIDATES = {"n_high_conf": 1010, "fraction": 0.4097, "outside_ad_fraction": 0.5213}
 

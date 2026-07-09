@@ -1,0 +1,23 @@
+{
+  "description": "DMPNN-SD model stack: matched cross-validation of the DMPNN graph net, the HGB model on RDKit-2D + engineered docking features, and their weighted blend (soft-voting ensemble). Source: authors' rmt_canpest / dmpnn pipeline (trained on Apple mps, not a cloud GPU).",
+  "stack": {
+    "type": "weighted soft-voting ensemble",
+    "formula": "p_stack = w * p_dmpnn + (1 - w) * p_hgb",
+    "blend_w_dmpnn": 0.62,
+    "threshold_f1_opt": 0.45,
+    "dmpnn_config": {"depth": 3, "hidden": 300, "dropout": 0.1, "ffn_hidden": 300, "ffn_num_layers": 2, "aggregation": "multi", "feature_set": "dock_eng+rdkit", "scheduler": "noam"}
+  },
+  "oof_cv_5fold_dock_eng_rdkit": {
+    "dmpnn": {"roc_auc": 0.9087, "pr_auc": 0.9268, "f1": 0.8531, "acc": 0.8442, "bal_acc": 0.8436},
+    "hgb":   {"roc_auc": 0.8995, "pr_auc": 0.9190, "f1": 0.8396, "acc": 0.8291, "bal_acc": 0.8281},
+    "blend": {"roc_auc": 0.9142, "pr_auc": 0.9326, "f1": 0.8578, "acc": 0.8508, "bal_acc": 0.8509},
+    "confusion_matrix_blend": [[1271, 220], [253, 1427]],
+    "ranking": "blend > dmpnn > hgb"
+  },
+  "per_featureset_cv_random_baseline": {
+    "rmt_rte_rdkit_only":  {"dmpnn": 0.9260, "hgb": 0.9159, "blend": 0.9313, "blend_w_dmpnn": 0.64},
+    "rmt_rte_integration": {"dmpnn": 0.9247, "hgb": 0.9158, "blend": 0.9300, "blend_w_dmpnn": 0.62},
+    "rmt_rte_global_dock": {"dmpnn": 0.9275, "hgb": 0.9158, "blend": 0.9317, "blend_w_dmpnn": 0.68}
+  },
+  "paper_reference": {"dmpnn_sd_roc_auc": 0.9283}
+}
