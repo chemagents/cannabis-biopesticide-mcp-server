@@ -170,24 +170,31 @@ def chemical_space() -> dict:
 
 @mcp.tool()
 def tox_ecotox_reference() -> dict:
-    """Toxicity / ecotoxicity comparison (Section 3.5 / Table S1) — Syntelly-model reference values.
+    """Toxicity / ecotoxicity models (Section 2.6 / 3.5) — open reproduction of the Syntelly models.
 
-    §3.5 uses the same Syntelly toxicity models as the Heracleum paper; for LIVE open-model
-    prediction of LD50 / hepatotoxicity / DILI / cardiotoxicity / carcinogenicity use the
-    `heracleum-tox` server (CatBoost/XGBoost on TDC). This tool reports the paper's published
-    metrics and headline comparison.
+    Syntelly's recipe (Sosnin/Shkil et al., Molecules 2024, 29, 1826) is reproduced here on the SAME
+    open data (TOXRIC + EPA ECOTOX) with a gradient-boosting ensemble — see `TOX_REPRODUCTION.md` and
+    `server/tox/`. The open ensemble BEATS the TOXRIC/Syntelly benchmark on Ames, Daphnia and fathead
+    minnow (random 5-fold CV, the paper's protocol); reproductive toxicity is a documented data limit.
+    LD50 routes / hepatotoxicity / DILI / cardiotoxicity / carcinogenicity are served by the
+    `heracleum-tox` server. Also reports the paper's published Table S1 quality + Table 3/4 comparison.
     """
+    om = reference.TOX_OPEN_MODELS
     return {
         "answer": {
-            "model_quality_table_s1": {k: {"metric": v[0], "value": v[1]}
-                                       for k, v in reference.TOX_METRICS.items()},
+            "open_model_reproduction": om["endpoints"],
+            "open_beats_benchmark": om["beats_benchmark"],
+            "model_quality_table_s1_syntelly": {k: {"metric": v[0], "value": v[1]}
+                                                for k, v in reference.TOX_METRICS.items()},
             "headline": reference.TOX_FINDINGS,
-            "finding": "C. sativa metabolites have a more favourable safety profile than synthetic "
-                       "pesticides (higher median LD50; far less hepatotoxicity/DILI; no extreme "
-                       "aquatic toxicity).",
+            "finding": "Open reproduction (TOXRIC+ECOTOX, ensemble) beats the Syntelly/TOXRIC benchmark "
+                       "on Ames (0.92 vs 0.88), Daphnia (RMSE 1.03 vs 1.11) and fathead minnow "
+                       "(0.79 vs 0.86) under the paper's random-CV protocol; reproductive is a data "
+                       "limit (n=156). C. sativa metabolites remain safer than synthetic pesticides.",
         },
-        "metadata": {"reference": PAPER,
-                     "live_tox_models": "heracleum-tox MCP server (open Syntelly analogue)"},
+        "metadata": {"reference": PAPER, "recipe": om["recipe"], "protocol": om["protocol"],
+                     "data_sources": om["data_sources"],
+                     "live_tox_models": "heracleum-tox MCP server (LD50/organ tox on TDC)"},
     }
 
 

@@ -53,6 +53,33 @@ TOX_FINDINGS = {"metabolite_ld50_rat": 1480, "metabolite_ld50_mouse": 1290,
                 "pesticide_ld50_rat": 1250, "pesticide_ld50_mouse": 990,
                 "hepatotoxic_metabolites_pct": 15, "hepatotoxic_pesticides_pct": 81}
 
+# --- Open reproduction of the Syntelly toxicity models (Section 2.6 / 3.5) ------------------------
+# Syntelly's recipe is published in Sosnin/Shkil et al., Molecules 2024, 29, 1826: per endpoint a
+# gradient-boosting pair (CatBoost on fingerprints + XGBoost on fragment descriptors) trained on the
+# open databases TOXRIC + EPA ECOTOX. We reproduce it on that SAME open data with a stronger ensemble
+# (CatBoost/XGBoost/LightGBM/ExtraTrees over ECFP + fragment + full-RDKit-descriptor views, combined
+# by a cross-validated meta-learner). Metrics below are 5-fold RANDOM CV (the paper's own protocol);
+# see TOX_REPRODUCTION.md for the scaffold-split companion and the multitask-DMPNN negative result.
+# Trainer: server/tox/stack_v2.py on server/data/tox/*.csv (deterministic, SEED=42, torch-free).
+TOX_OPEN_MODELS = {
+    "recipe": "ensemble (CatBoost/XGBoost/LightGBM/ExtraTrees over ECFP + fragments + RDKit-2D) + meta-stack",
+    "protocol": "5-fold random CV (matches the paper); scaffold companion in TOX_REPRODUCTION.md",
+    "data_sources": "TOXRIC (Wu et al., Nucleic Acids Res 2023) + EPA ECOTOX (aquatic augmentation)",
+    # endpoint -> metric, our open ensemble, TOXRIC/Syntelly benchmark, paper hackathon, n
+    "endpoints": {
+        "ames":                {"metric": "ROC-AUC", "ours": 0.9225, "benchmark": 0.88,  "hackathon": 0.894, "n": 7460},
+        "daphnia_magna_lc50":  {"metric": "RMSE",    "ours": 1.026,  "benchmark": 1.109, "hackathon": 0.817, "n": 345},
+        "fathead_minnow_lc50": {"metric": "RMSE",    "ours": 0.788,  "benchmark": 0.864, "hackathon": 0.72,  "n": 812},
+        "reproductive":        {"metric": "ROC-AUC", "ours": 0.586,  "benchmark": 0.927, "hackathon": 0.739, "n": 156,
+                                "note": "low-confidence: n=156, 88% positive -> metric is noise-dominated "
+                                        "(5-fold folds span 0.14-0.86). Not learnable at this open-data scale "
+                                        "under GB, single-task DMPNN, or multitask DMPNN — a data limit, not a model one."},
+    },
+    "beats_benchmark": ["ames", "daphnia_magna_lc50", "fathead_minnow_lc50"],
+    "covered_by_heracleum_tox": ["mouse_oral_ld50", "rat_oral_ld50", "carcinogenicity",
+                                 "hepatotoxicity", "dili", "cardiotoxicity"],
+}
+
 
 def load_bundled_reference() -> dict:
     """Load the authors' bundled ablation/RMT reference metrics if present."""
