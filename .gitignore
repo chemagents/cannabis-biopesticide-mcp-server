@@ -4,3 +4,4 @@ __pycache__/
 artifacts/
 model_cache/
 .env
+catboost_info/
