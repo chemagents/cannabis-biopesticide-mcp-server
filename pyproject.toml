@@ -25,6 +25,9 @@ dev = ["pytest>=8"]
 # Exact DMPNN reproduction (heavy, torch). The default HGB backend reproduces ROC-AUC ~0.93
 # without torch, so this is optional.
 dmpnn = ["torch>=2.2"]
+# Open reproduction of the Syntelly toxicity models (server/tox/ on server/data/tox/). Torch-free
+# gradient-boosting ensemble; catboost is already a core dep, this adds the two other learners.
+tox = ["xgboost>=2.0", "lightgbm>=4.0"]
 
 [project.scripts]
 cannabis-biopesticide-mcp-server = "server.canpest_server:main"
@@ -39,6 +42,13 @@ packages = ["server"]
 "server/data/split_registry.csv" = "server/data/split_registry.csv"
 "server/data/split_registry_scaffold.csv" = "server/data/split_registry_scaffold.csv"
 "server/data/dmpnn_pred.csv" = "server/data/dmpnn_pred.csv"
+"server/data/tox/toxric_ames.csv" = "server/data/tox/toxric_ames.csv"
+"server/data/tox/toxric_reproductive.csv" = "server/data/tox/toxric_reproductive.csv"
+"server/data/tox/toxric_developmental.csv" = "server/data/tox/toxric_developmental.csv"
+"server/data/tox/toxric_daphnia.csv" = "server/data/tox/toxric_daphnia.csv"
+"server/data/tox/toxric_fathead.csv" = "server/data/tox/toxric_fathead.csv"
+"server/data/tox/daphnia_aug.csv" = "server/data/tox/daphnia_aug.csv"
+"server/data/tox/fathead_aug.csv" = "server/data/tox/fathead_aug.csv"
 
 [build-system]
 requires = ["hatchling"]

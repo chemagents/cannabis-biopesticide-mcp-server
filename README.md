@@ -21,7 +21,7 @@ expensive docking output; recompute the analyses).
 | **DMPNN-SD** QSAR (ROC-AUC ~0.93) | **DMPNN + HGB soft-voting stack** (`p = 0.62·p_DMPNN + 0.38·p_HGB`; component preds bundled, blend recomputed in-code, torch-free) |
 | CB-SD / SVM-SD (docking features) | gradient boosting on docking scores / RTE |
 | Applicability domain (Probability) | Tanimoto kNN(k=5) + Gaussian |
-| Toxicity / ecotoxicity (Syntelly) | `heracleum-tox` server (open Syntelly analogue) + published Table S1/3/4 values |
+| Toxicity / ecotoxicity (Syntelly) | **open reproduction** in `server/tox/` on TOXRIC+ECOTOX (GB ensemble — beats the Syntelly benchmark on Ames/Daphnia/fathead; see [TOX_REPRODUCTION.md](./TOX_REPRODUCTION.md)); LD50/organ tox via `heracleum-tox` |
 
 ## Tools
 
@@ -35,7 +35,7 @@ expensive docking output; recompute the analyses).
 | `docking_veto` | §3.3 | docking-consistency veto: FPR reduction (p_QSAR × p_RMT-RTE) |
 | `predict_biopesticides` | §3.4 | metabolite biopesticide probabilities + AD → candidate count |
 | `chemical_space` | Fig S2 | metabolites-vs-pesticides t-SNE map |
-| `tox_ecotox_reference` | §3.5 / Table S1 | tox/ecotox model metrics + safety comparison |
+| `tox_ecotox_reference` | §2.6 / §3.5 | open tox reproduction (TOXRIC+ECOTOX ensemble) vs Syntelly benchmark + safety comparison |
 | `reproduce_all` | — | headline numbers vs the paper |
 | `reproduce_claims` | all | the paper's conclusions restated with reproduced numbers |
 
