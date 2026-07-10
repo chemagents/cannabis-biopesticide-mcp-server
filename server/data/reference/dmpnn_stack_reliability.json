@@ -1,0 +1,215 @@
+{
+  "source": "team's Activity/dmpnn pipeline re-run with OOF persistence (dmpnn_reliability.py): 5-fold paired CV, 2 seeds, 40 epochs; baseline (dock_eng+rdkit) vs +rmt_rte_rec",
+  "question": "does adding RMT-RTE improve RELIABILITY (not just ROC-AUC) of the DMPNN / stack?",
+  "by_split": {
+    "random": {
+      "dmpnn": {
+        "roc_auc": [
+          0.9245,
+          0.9218
+        ],
+        "brier": [
+          0.105,
+          0.1075
+        ],
+        "ece": [
+          0.0341,
+          0.048
+        ],
+        "precision@0.7": [
+          0.9247,
+          0.9218
+        ],
+        "coverage@0.7": [
+          0.4522,
+          0.4516
+        ],
+        "fpr@f1opt": [
+          0.1174,
+          0.1261
+        ],
+        "recall@f1opt": [
+          0.85,
+          0.8536
+        ],
+        "matched_cov_precision_top20pct": [
+          0.9905,
+          0.9842
+        ]
+      },
+      "hgb": {
+        "roc_auc": [
+          0.9146,
+          0.9071
+        ],
+        "brier": [
+          0.113,
+          0.1185
+        ],
+        "ece": [
+          0.0197,
+          0.0243
+        ],
+        "precision@0.7": [
+          0.9101,
+          0.9012
+        ],
+        "coverage@0.7": [
+          0.4456,
+          0.4437
+        ],
+        "fpr@f1opt": [
+          0.1522,
+          0.1516
+        ],
+        "recall@f1opt": [
+          0.8548,
+          0.8423
+        ],
+        "matched_cov_precision_top20pct": [
+          0.9826,
+          0.9779
+        ]
+      },
+      "blend": {
+        "roc_auc": [
+          0.929,
+          0.9264
+        ],
+        "brier": [
+          0.1007,
+          0.1024
+        ],
+        "ece": [
+          0.0186,
+          0.0232
+        ],
+        "precision@0.7": [
+          0.9326,
+          0.9306
+        ],
+        "coverage@0.7": [
+          0.4447,
+          0.4456
+        ],
+        "fpr@f1opt": [
+          0.1321,
+          0.1167
+        ],
+        "recall@f1opt": [
+          0.8673,
+          0.8512
+        ],
+        "matched_cov_precision_top20pct": [
+          0.9874,
+          0.989
+        ]
+      }
+    },
+    "scaffold": {
+      "dmpnn": {
+        "roc_auc": [
+          0.9077,
+          0.9004
+        ],
+        "brier": [
+          0.1199,
+          0.126
+        ],
+        "ece": [
+          0.041,
+          0.0547
+        ],
+        "precision@0.7": [
+          0.9155,
+          0.9086
+        ],
+        "coverage@0.7": [
+          0.433,
+          0.4311
+        ],
+        "fpr@f1opt": [
+          0.1717,
+          0.1388
+        ],
+        "recall@f1opt": [
+          0.844,
+          0.8196
+        ],
+        "matched_cov_precision_top20pct": [
+          0.9858,
+          0.9858
+        ]
+      },
+      "hgb": {
+        "roc_auc": [
+          0.9015,
+          0.8915
+        ],
+        "brier": [
+          0.1242,
+          0.1297
+        ],
+        "ece": [
+          0.0229,
+          0.0302
+        ],
+        "precision@0.7": [
+          0.9039,
+          0.9036
+        ],
+        "coverage@0.7": [
+          0.4232,
+          0.4153
+        ],
+        "fpr@f1opt": [
+          0.2113,
+          0.1999
+        ],
+        "recall@f1opt": [
+          0.8631,
+          0.8435
+        ],
+        "matched_cov_precision_top20pct": [
+          0.9842,
+          0.9716
+        ]
+      },
+      "blend": {
+        "roc_auc": [
+          0.9151,
+          0.9078
+        ],
+        "brier": [
+          0.1132,
+          0.1182
+        ],
+        "ece": [
+          0.0211,
+          0.0211
+        ],
+        "precision@0.7": [
+          0.9294,
+          0.9173
+        ],
+        "coverage@0.7": [
+          0.4201,
+          0.4273
+        ],
+        "fpr@f1opt": [
+          0.1455,
+          0.1435
+        ],
+        "recall@f1opt": [
+          0.8476,
+          0.8345
+        ],
+        "matched_cov_precision_top20pct": [
+          0.9921,
+          0.9858
+        ]
+      }
+    }
+  },
+  "verdict": "adding RMT-RTE does not improve reliability on the DMPNN or the stack: at MATCHED coverage precision@0.7 falls (blend 0.9326->0.9306 random, 0.9294->0.9173 scaffold), Brier rises (0.1007->0.1024, 0.1132->0.1182) and ECE rises/flat. The only gain \u2014 FPR at each arm's own F1-optimal threshold \u2014 is a thresholding artifact (recall drops in lockstep), the same effect seen on HGB. Reliability, like discrimination, does not improve."
+}

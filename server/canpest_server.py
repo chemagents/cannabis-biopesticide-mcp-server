@@ -172,6 +172,7 @@ def confidence_ablation() -> dict:
             },
             "scaffold_companion": res.get("scaffold_companion"),
             "dmpnn_stack_rmt_kfold": res.get("dmpnn_stack_rmt_kfold"),
+            "dmpnn_stack_reliability": confidence._load_stack_reliability(),
             "finding": res["verdict"],
         },
         "metadata": {
@@ -182,8 +183,10 @@ def confidence_ablation() -> dict:
             "reference": PAPER,
             "caveat": "The HGB analogue isolates the feature contribution; the team's own paired k-fold CV "
                       "(dmpnn_stack_rmt_kfold) shows RMT-RTE does not lift the DMPNN or the DMPNN+HGB stack "
-                      "either — the split_00 number that suggested otherwise was a one-split artifact. "
-                      "Calibration (Brier/ECE) on the stack would need per-fold OOF probabilities re-run.",
+                      "on ROC-AUC, and a re-run with OOF persistence (dmpnn_stack_reliability) confirms it "
+                      "does not improve RELIABILITY either — at matched coverage precision@0.7 falls and "
+                      "Brier/ECE rise on both splits; the only gain (FPR at each arm's own threshold) is a "
+                      "thresholding artifact. The single split_00 number that suggested otherwise was an artifact.",
         },
     }
 

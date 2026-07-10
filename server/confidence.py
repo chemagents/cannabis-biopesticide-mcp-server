@@ -246,6 +246,19 @@ def _load_stack_rmt_kfold() -> dict:
     return json.loads(path.read_text())
 
 
+def _load_stack_reliability() -> dict:
+    """Team's DMPNN pipeline re-run with OOF persistence (dmpnn_reliability.py): RELIABILITY metrics.
+
+    Bundled as reference_dir/dmpnn_stack_reliability.json. Answers the sharper question — not "does
+    RMT-RTE lift ROC-AUC" but "does it improve reliability (FPR, precision@0.7 at matched coverage,
+    Brier, ECE)" on the DMPNN and the DMPNN+HGB stack. Measured 5-fold on random + scaffold: it does not.
+    """
+    path = Path(get_settings().reference_dir) / "dmpnn_stack_reliability.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text())
+
+
 def load_confidence_ablation() -> dict | None:
     """Load the bundled confidence-ablation result (reference_dir/confidence_ablation.json)."""
     path = Path(get_settings().reference_dir) / "confidence_ablation.json"

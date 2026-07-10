@@ -103,16 +103,36 @@ RMT-RTE is a weak (~0.80) and partly redundant signal; adding it dilutes rather 
 graph net exactly as on the tree. **My earlier claim that RMT lifts the blend (0.9343 → 0.9415) was an
 artifact of the single `split_00` ablation; the honest k-fold CV refutes it for every model.**
 
+## Reliability (not accuracy) on the DMPNN/stack — measured directly
+
+ROC-AUC is ranking, not reliability; a lower AUC does not by itself prove worse FPR/precision at the
+operating point. So we re-ran the team's DMPNN pipeline with **per-fold OOF-probability persistence**
+(`dmpnn_reliability.py`, 5-fold paired CV, 2 seeds, 40 epochs, random + scaffold; bundled as
+`server/data/reference/dmpnn_stack_reliability.json`) and scored the reliability metrics for
+baseline vs +rmt_rte_rec on DMPNN, HGB and the blend. At **matched operating points** RMT-RTE does not
+help — it slightly *hurts*:
+
+| blend, baseline → +rmt_rte_rec | random | scaffold |
+|---|---|---|
+| precision@0.7 (coverage held ~constant) | 0.9326 → **0.9306** | 0.9294 → **0.9173** |
+| Brier ↓ | 0.1007 → **0.1024** | 0.1132 → **0.1182** |
+| ECE ↓ | 0.0186 → **0.0232** | 0.0211 → 0.0211 |
+| matched-coverage precision (top-20%) | 0.9874 → 0.9890 | 0.9921 → **0.9858** |
+
+The DMPNN alone behaves the same. The **only** metric that improves is FPR at each arm's *own*
+F1-optimal threshold (blend random 0.132 → 0.117) — but recall drops in lockstep (0.867 → 0.851), so it
+is the identical thresholding artifact seen on HGB: +rmt just lands a more conservative threshold, which
+the baseline reaches by raising its own. Controlled for coverage, the advantage is gone.
+
 ## Verdict
 
-**Adding docking / RMT-RTE does not improve model confidence — on any model here.** On the HGB analogue
-it is flat-to-worse as features and a thresholding trade as a veto (dominated by structure at matched
-coverage). On the DMPNN and the DMPNN+HGB stack, the team's paired k-fold CV shows it *lowers*
-discrimination on both random and scaffold splits. The one number that suggested otherwise was a
-single-split artifact. What remains unmeasured is calibration (Brier/ECE) *on the stack specifically* —
-`eval_rmt_rte.py` saved only summary AUC/PR-AUC, not per-fold OOF probabilities; re-running it with
-probability persistence would settle it, but since RMT-RTE uniformly *lowers* the stack's discrimination,
-a calibration reversal is unlikely.
+**Adding docking / RMT-RTE improves neither accuracy nor reliability — on any model here.** On the HGB
+analogue it is flat-to-worse as features and a thresholding trade as a veto (dominated by structure at
+matched coverage). On the DMPNN and the DMPNN+HGB stack, the team's paired k-fold CV shows it *lowers*
+ROC-AUC/PR-AUC on both splits, and the OOF re-run confirms precision@0.7 (matched coverage), Brier and ECE
+also go flat-to-worse. The one number that ever suggested otherwise (single-split blend 0.9343 → 0.9415)
+was an artifact. RMT-reconstructed RTE is a weak, partly-redundant signal (~0.76 AUC) that dilutes rather
+than sharpens, on the graph net exactly as on the tree.
 
 ## Reproduce
 
