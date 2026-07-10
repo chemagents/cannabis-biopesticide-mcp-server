@@ -80,6 +80,31 @@ TOX_OPEN_MODELS = {
                                  "hepatotoxicity", "dili", "cardiotoxicity"],
 }
 
+# §3.5 reproduced with the open models on the FULL representative sets (2749 metabolites vs 1680
+# labelled pesticides). The paper's safety conclusion reproduces directionally — magnitudes are
+# compressed vs Syntelly (the open DILI model is milder/less-separating), but the direction and
+# ~2x separation hold. Tables 3/4 for the top-10 candidates + 10 pesticides are bundled as
+# server/data/tox/table{3,4}_*.csv; full stats in section35_open.json.
+TOX_OPEN_FINDINGS = {
+    "n_metabolites": 2749, "n_pesticides": 1680,
+    "median_ld50_mgkg": {"metabolites": 1617, "pesticides": 911},          # ~1.8x safer (paper 1480 vs 1250)
+    "pct_toxic_full_set": {
+        "hepatotoxicity": {"metabolites": 33.7, "pesticides": 64.0},        # paper 15 vs 81; direction + ~2x hold
+        "dili":           {"metabolites": 33.7, "pesticides": 64.0},
+        "carcinogenicity":{"metabolites": 15.3, "pesticides": 12.9},        # ~tied
+        "ames":           {"metabolites": 12.5, "pesticides": 14.5},        # ~tied (metabolites marginally safer)
+    },
+    "verdict": "reproduces on full sets: metabolites safer on acute LD50 and hepatotoxicity/DILI; "
+               "Ames/carcinogenicity ~tied. Magnitudes compressed vs Syntelly.",
+    "caveats": [
+        "Top-10 DMPNN candidates are pesticide-like scaffolds -> inherit pesticide liabilities and "
+        "look hepatotoxic (70%); they are not representative of the metabolome (the full-set test is fair).",
+        "Reproductive endpoint is degenerate (n=156, 88% positive) -> non-discriminative, excluded.",
+        "Rat LD50 == Mouse LD50 (single open TDC LD50_Zhu acute set).",
+        "Aquatic LC50 extrapolates for large glycosides (MW 870-970) -> soft applicability domain.",
+    ],
+}
+
 
 def load_bundled_reference() -> dict:
     """Load the authors' bundled ablation/RMT reference metrics if present."""

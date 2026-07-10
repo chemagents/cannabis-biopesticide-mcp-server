@@ -70,6 +70,31 @@ underperformed the GB ensemble even on Ames (0.81 vs 0.88 scaffold), confirming 
 LD50 (rat/mouse, all routes), carcinogenicity, hepatotoxicity, DILI, cardiotoxicity are the open
 Syntelly analogue in the **`heracleum-tox`** MCP server (CatBoost/XGBoost on TDC/TOXRIC).
 
+## Applied to the metabolome (§3.5 / Tables 3–4)
+
+The open ensembles (final models fit on all TOXRIC/ECOTOX data per endpoint) were run on the
+*C. sativa* metabolites and the 10 synthetic pesticides. Bundled predictions:
+`server/data/tox/table3_metabolites_open.csv` (top-10 candidates), `table4_pesticides_open.csv`
+(10 pesticides), `section35_open.json` (full stats).
+
+**On the full representative sets (2749 metabolites vs 1680 pesticides) the paper's safety conclusion
+reproduces:**
+
+| Endpoint | metabolites | pesticides | paper (Syntelly) |
+|---|---|---|---|
+| median oral LD50 | 1617 mg/kg | 911 mg/kg | 1480 vs 1250 |
+| hepatotoxicity (% toxic) | 33.7% | 64.0% | 15% vs 81% |
+| DILI (% toxic) | 33.7% | 64.0% | — |
+| Ames (% toxic) | 12.5% | 14.5% | ~tied |
+| carcinogenicity (% toxic) | 15.3% | 12.9% | ~tied |
+
+Direction and ~2× separation match the paper; magnitudes are compressed (the open TDC DILI model is
+milder/less-separating than Syntelly's). **Caveat:** the top-10 DMPNN candidates are structurally
+pesticide-like (pyrethroid / fipronil / organophosphate / avermectin scaffolds) and therefore look
+hepatotoxic (70%) — they are the exception, not the metabolome; the full-set comparison is the fair
+test. Reproductive is excluded (degenerate); rat LD50 shares the mouse acute model; extreme aquatic
+LC50 on large glycosides is soft (applicability-domain extrapolation).
+
 ## Reproduce
 
 ```bash

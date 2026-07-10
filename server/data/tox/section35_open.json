@@ -1,0 +1,127 @@
+{
+  "top10_metabolites": {
+    "median_mouse_ld50_mgkg": 548.14,
+    "median_rat_ld50_mgkg": 548.14,
+    "median_daphnia_lc50_mmol_l": 0.00051,
+    "median_fathead_lc50_mmol_l": 0.00177,
+    "pct_toxic_hepatotoxicity": 70.0,
+    "pct_toxic_dili": 70.0,
+    "pct_toxic_carcinogenicity": 30.0,
+    "pct_toxic_ames": 10.0,
+    "n": 10
+  },
+  "pesticides_10": {
+    "median_mouse_ld50_mgkg": 299.96,
+    "median_rat_ld50_mgkg": 299.96,
+    "median_daphnia_lc50_mmol_l": 0.00161,
+    "median_fathead_lc50_mmol_l": 0.00402,
+    "pct_toxic_hepatotoxicity": 60.0,
+    "pct_toxic_dili": 60.0,
+    "pct_toxic_carcinogenicity": 30.0,
+    "pct_toxic_ames": 0.0,
+    "n": 10
+  },
+  "full_metabolites": {
+    "median_mouse_ld50_mgkg": 1617.27,
+    "median_rat_ld50_mgkg": 1617.27,
+    "n": 2749,
+    "pct_toxic_hepatotoxicity": 33.68,
+    "pct_toxic_dili": 33.68,
+    "pct_toxic_carcinogenicity": 15.28,
+    "pct_toxic_ames": 12.48
+  },
+  "labelled_pesticides": {
+    "median_mouse_ld50_mgkg": 910.8,
+    "median_rat_ld50_mgkg": 910.8,
+    "n": 1680,
+    "pct_toxic_hepatotoxicity": 63.99,
+    "pct_toxic_dili": 63.99,
+    "pct_toxic_carcinogenicity": 12.86,
+    "pct_toxic_ames": 14.52
+  },
+  "_meta": {
+    "ld50_note": "Rat oral LD50 == Mouse oral LD50 (single TDC LD50_Zhu acute set; rat approximated).",
+    "endpoint_units": {
+      "ld50": "mg/kg (10**(-pred)*MW*1000, pred=-log10 mol/kg from TDC LD50_Zhu)",
+      "lc50": "mmol/L (10**(-pLC50)*1000)",
+      "acute_aquatic": "GHS/GOST 57455-2017: Class1<=1, Class2<=10, Class3<=100 mg/L (more toxic of daphnia/fathead)"
+    },
+    "training_meta": {
+      "ames": {
+        "task": "classification",
+        "n_train": 7460,
+        "balance": {
+          "0.0": 3270,
+          "1.0": 4190
+        }
+      },
+      "repro": {
+        "task": "classification",
+        "n_train": 156,
+        "balance": {
+          "0.0": 18,
+          "1.0": 138
+        }
+      },
+      "daphnia": {
+        "task": "regression",
+        "n_train": 345,
+        "balance": null
+      },
+      "fathead": {
+        "task": "regression",
+        "n_train": 812,
+        "balance": null
+      },
+      "ld50": {
+        "task": "regression",
+        "n_train": 7385,
+        "balance": null
+      },
+      "carcino": {
+        "task": "classification",
+        "n_train": 280,
+        "balance": {
+          "0.0": 220,
+          "1.0": 60
+        }
+      },
+      "dili": {
+        "task": "classification",
+        "n_train": 475,
+        "balance": {
+          "0.0": 239,
+          "1.0": 236
+        }
+      },
+      "herg": {
+        "task": "classification",
+        "n_train": 655,
+        "balance": {
+          "0.0": 204,
+          "1.0": 451
+        }
+      }
+    }
+  },
+  "full_set_pct_toxic_comparison": {
+    "n_metabolites": 2749,
+    "n_labelled_pesticides": 1680,
+    "hepatotoxicity": {
+      "metabolites_pct": 33.68,
+      "pesticides_pct": 63.99
+    },
+    "dili": {
+      "metabolites_pct": 33.68,
+      "pesticides_pct": 63.99
+    },
+    "carcinogenicity": {
+      "metabolites_pct": 15.28,
+      "pesticides_pct": 12.86
+    },
+    "ames": {
+      "metabolites_pct": 12.48,
+      "pesticides_pct": 14.52
+    }
+  }
+}
