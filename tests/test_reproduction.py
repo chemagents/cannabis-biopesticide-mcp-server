@@ -70,9 +70,10 @@ def test_confidence_ablation_bundled_and_honest():
     v = res["veto_mean"]
     assert v["auc_veto"] <= v["auc_qsar"]                         # veto ranks no better than structure
     assert v["matched_prec_qsar"] >= v["matched_prec_veto"]       # structure purer at matched coverage
-    # RMT *does* help the graph-net stack (authors' bundled split_00 ablation)
-    ref = res["dmpnn_blend_reference"]["by_feature_set"]
-    assert ref["+rmt_rte_rec"]["blend"]["roc_auc"] > ref["structure"]["blend"]["roc_auc"]
+    # RMT-RTE does not help the DMPNN/stack either — team's paired k-fold CV: rmt_rte_rec LOWERS blend ROC
+    kf = res["dmpnn_stack_rmt_kfold"]["paired_kfold"]["rmt_rte_rdkit_only"]["by_split"]
+    assert kf["random"]["blend"]["rmt_rte_rec_roc"] < kf["random"]["blend"]["baseline_roc"]
+    assert kf["scaffold"]["blend"]["rmt_rte_rec_roc"] < kf["scaffold"]["blend"]["baseline_roc"]
 
 
 @pytest.mark.slow

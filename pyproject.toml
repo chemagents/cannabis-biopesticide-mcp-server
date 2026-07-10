@@ -44,6 +44,7 @@ packages = ["server"]
 "server/data/dmpnn_pred.csv" = "server/data/dmpnn_pred.csv"
 "server/data/reference/confidence_ablation.json" = "server/data/reference/confidence_ablation.json"
 "server/data/reference/confidence_reliability.png" = "server/data/reference/confidence_reliability.png"
+"server/data/reference/dmpnn_stack_rmt_cv.json" = "server/data/reference/dmpnn_stack_rmt_cv.json"
 "server/data/tox/toxric_ames.csv" = "server/data/tox/toxric_ames.csv"
 "server/data/tox/toxric_reproductive.csv" = "server/data/tox/toxric_reproductive.csv"
 "server/data/tox/toxric_developmental.csv" = "server/data/tox/toxric_developmental.csv"

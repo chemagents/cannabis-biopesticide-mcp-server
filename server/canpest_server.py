@@ -171,7 +171,7 @@ def confidence_ablation() -> dict:
                 "mean_fusion_auc": round(v["auc_mean_fusion"], 4),
             },
             "scaffold_companion": res.get("scaffold_companion"),
-            "dmpnn_blend_reference": res["dmpnn_blend_reference"],
+            "dmpnn_stack_rmt_kfold": res.get("dmpnn_stack_rmt_kfold"),
             "finding": res["verdict"],
         },
         "metadata": {
@@ -180,8 +180,10 @@ def confidence_ablation() -> dict:
             "paper_veto": {"fpr_before": reference.QSAR["fpr_before"],
                            "fpr_after_veto": reference.QSAR["fpr_after_veto"]},
             "reference": PAPER,
-            "caveat": "HGB analogue isolates the feature contribution; the exact DMPNN-SD stack is the "
-                      "model where RMT-RTE actually lifts discrimination (dmpnn_blend_reference).",
+            "caveat": "The HGB analogue isolates the feature contribution; the team's own paired k-fold CV "
+                      "(dmpnn_stack_rmt_kfold) shows RMT-RTE does not lift the DMPNN or the DMPNN+HGB stack "
+                      "either — the split_00 number that suggested otherwise was a one-split artifact. "
+                      "Calibration (Brier/ECE) on the stack would need per-fold OOF probabilities re-run.",
         },
     }
 
