@@ -86,19 +86,29 @@ TOX_OPEN_MODELS = {
 # ~2x separation hold. Tables 3/4 for the top-10 candidates + 10 pesticides are bundled as
 # server/data/tox/table{3,4}_*.csv; full stats in section35_open.json.
 TOX_OPEN_FINDINGS = {
-    "n_metabolites": 2749, "n_pesticides": 1680,
-    "median_ld50_mgkg": {"metabolites": 1617, "pesticides": 911},          # ~1.8x safer (paper 1480 vs 1250)
+    # Full sets, stereo-free deduped + decontaminated (metabolites sharing a stereo-free structure
+    # with the labelled set removed): 2283 metabolites vs 1680 pesticides. The raw 2749 gives
+    # near-identical numbers (see "cleaning") — the metabolite/pesticide gap is a model-calibration
+    # effect, not a data artifact.
+    "n_metabolites": 2283, "n_pesticides": 1680,
+    "median_ld50_mgkg": {"metabolites": 1782, "pesticides": 911},           # > paper's 1480; metabolites safer
     "pct_toxic_full_set": {
-        "hepatotoxicity": {"metabolites": 33.7, "pesticides": 64.0},        # paper 15 vs 81; direction + ~2x hold
-        "dili":           {"metabolites": 33.7, "pesticides": 64.0},
-        "carcinogenicity":{"metabolites": 15.3, "pesticides": 12.9},        # ~tied
-        "ames":           {"metabolites": 12.5, "pesticides": 14.5},        # ~tied (metabolites marginally safer)
+        "hepatotoxicity": {"metabolites": 31.9, "pesticides": 64.0},        # paper 15 vs 81; direction + ~2x hold
+        "dili":           {"metabolites": 31.9, "pesticides": 64.0},
+        "carcinogenicity":{"metabolites": 16.2, "pesticides": 12.9},        # ~tied
+        "ames":           {"metabolites": 11.6, "pesticides": 14.5},        # ~tied (metabolites marginally safer)
     },
-    "verdict": "reproduces on full sets: metabolites safer on acute LD50 and hepatotoxicity/DILI; "
-               "Ames/carcinogenicity ~tied. Magnitudes compressed vs Syntelly.",
+    "cleaning": "raw 2749 -> 2667 stereo-free-unique (dedup neutral: hepatotox 33.7->33.9%) -> 2283 "
+                "after removing 384 metabolites structurally identical to labelled pesticides "
+                "(hepatotox -> 31.9%, LD50 -> 1782). Duplicates/contamination move it only ~2 pts; the "
+                "residual gap to the paper's 15% is the open TDC-DILI model being more liberal than Syntelly.",
+    "verdict": "reproduces robustly (holds at every cleaning level): metabolites ~2x less hepatotoxic "
+               "(32% vs 64%) and higher LD50 (1782 vs 911, exceeding the paper's 1480); "
+               "Ames/carcinogenicity ~tied. Absolute magnitudes compressed vs Syntelly (model "
+               "calibration, not data).",
     "caveats": [
-        "Top-10 DMPNN candidates are pesticide-like scaffolds -> inherit pesticide liabilities and "
-        "look hepatotoxic (70%); they are not representative of the metabolome (the full-set test is fair).",
+        "Top-10 DMPNN candidates are pesticide-like scaffolds -> look hepatotoxic (70%); not "
+        "representative of the metabolome (the full-set comparison is the fair test).",
         "Reproductive endpoint is degenerate (n=156, 88% positive) -> non-discriminative, excluded.",
         "Rat LD50 == Mouse LD50 (single open TDC LD50_Zhu acute set).",
         "Aquatic LC50 extrapolates for large glycosides (MW 870-970) -> soft applicability domain.",

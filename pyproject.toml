@@ -52,6 +52,7 @@ packages = ["server"]
 "server/data/tox/table3_metabolites_open.csv" = "server/data/tox/table3_metabolites_open.csv"
 "server/data/tox/table4_pesticides_open.csv" = "server/data/tox/table4_pesticides_open.csv"
 "server/data/tox/section35_open.json" = "server/data/tox/section35_open.json"
+"server/data/tox/section35_open_clean.json" = "server/data/tox/section35_open_clean.json"
 
 [build-system]
 requires = ["hatchling"]

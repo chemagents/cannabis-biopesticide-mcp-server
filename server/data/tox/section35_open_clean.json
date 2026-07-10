@@ -1,0 +1,58 @@
+{
+  "paper_targets": {
+    "metabolite_hepatotoxicity_pct": 15,
+    "pesticide_hepatotoxicity_pct": 81,
+    "metabolite_median_ld50_mgkg": 1480
+  },
+  "dedup_stats": {
+    "n_metabolite_rows": 2749,
+    "n_stereofree_unique": 2667,
+    "n_stereo_dup_rows": 82,
+    "n_deduped_overlapping_labelled": 384,
+    "n_labelled_ref_rows": 3171
+  },
+  "metabolites": {
+    "raw_2749": {
+      "n": 2749,
+      "pct_toxic_hepatotoxicity": 33.68,
+      "pct_toxic_dili": 33.68,
+      "pct_toxic_carcinogenicity": 15.28,
+      "pct_toxic_ames": 12.48,
+      "median_ld50_mgkg": 1617.27
+    },
+    "deduped_stereofree": {
+      "n": 2667,
+      "pct_toxic_hepatotoxicity": 33.86,
+      "pct_toxic_dili": 33.86,
+      "pct_toxic_carcinogenicity": 15.6,
+      "pct_toxic_ames": 12.6,
+      "median_ld50_mgkg": 1631.6
+    },
+    "deduped_decontaminated": {
+      "n": 2283,
+      "pct_toxic_hepatotoxicity": 31.89,
+      "pct_toxic_dili": 31.89,
+      "pct_toxic_carcinogenicity": 16.21,
+      "pct_toxic_ames": 11.61,
+      "median_ld50_mgkg": 1781.8
+    }
+  },
+  "labelled_pesticides_active": {
+    "raw_1680": {
+      "n": 1680,
+      "pct_toxic_hepatotoxicity": 63.99,
+      "pct_toxic_dili": 63.99,
+      "pct_toxic_carcinogenicity": 12.86,
+      "pct_toxic_ames": 14.52,
+      "median_ld50_mgkg": 910.8
+    },
+    "deduped_stereofree": {
+      "n": 1680,
+      "pct_toxic_hepatotoxicity": 63.99,
+      "pct_toxic_dili": 63.99,
+      "pct_toxic_carcinogenicity": 12.86,
+      "pct_toxic_ames": 14.52,
+      "median_ld50_mgkg": 910.8
+    }
+  }
+}

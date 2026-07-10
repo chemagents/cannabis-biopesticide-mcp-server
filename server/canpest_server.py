@@ -192,8 +192,9 @@ def tox_ecotox_reference() -> dict:
                        "on Ames (0.92 vs 0.88), Daphnia (1.03 vs 1.11) and fathead (0.79 vs 0.86) under "
                        "the paper's random-CV protocol. Running the open models on the full sets "
                        "REPRODUCES the paper's safety conclusion: metabolites are safer on acute LD50 "
-                       "(median 1617 vs 911 mg/kg) and hepatotoxicity/DILI (34% vs 64% toxic), "
-                       "Ames/carcinogenicity ~tied; magnitudes compressed vs Syntelly. Reproductive is a "
+                       "(median 1782 vs 911 mg/kg) and hepatotoxicity/DILI (32% vs 64% toxic), "
+                       "Ames/carcinogenicity ~tied; magnitudes compressed vs Syntelly (model calibration, "
+                       "verified NOT data — dedup+decontamination move it only ~2 pts). Reproductive is a "
                        "data limit; the top-10 candidates are pesticide-like (see caveats).",
         },
         "metadata": {"reference": PAPER, "recipe": om["recipe"], "protocol": om["protocol"],
