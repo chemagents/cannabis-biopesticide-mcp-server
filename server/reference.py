@@ -37,6 +37,29 @@ QSAR_STACK = {
                                  "rmt_rte_global_dock": 0.9317},
 }
 
+# Confidence / calibration ablation (Section 3.3) — does docking / RMT-RTE make the model MORE SURE?
+# An adversarial test of the TZ "adding RMT / docking-scores improves confidence", orthogonal to
+# ROC-AUC. HGB base learner + qsar_ablation feature ladder, calibration/sharpness/precision metrics
+# over the 10 random splits + the scaffold split. Bundled: server/data/reference/confidence_ablation.json
+# (+ confidence_reliability.png). Regenerate: python -m server.confidence. See CONFIDENCE.md.
+# Honest verdict: for the open torch-free HGB analogue it does NOT — structure descriptors saturate,
+# and the p_QSAR x p_RMT-RTE veto's precision@0.7/FPR gains are a thresholding artifact (at matched
+# coverage the structure model alone is more precise; veto AUC is lower). RMT helps only the DMPNN/blend.
+CONFIDENCE_ABLATION = {
+    "protocol": "10 random 80/20 splits + 1 Bemis-Murcko scaffold split; HGB base learner; features vary",
+    "random_ladder_auc": {"structure": 0.9179, "+dock6": 0.9165, "+raw_rte": 0.9133,
+                          "+rmt_rte_sel": 0.9143, "+rmt_rte_rec": 0.9134},   # structure is best; RMT does not help
+    "random_ladder_brier": {"structure": 0.1130, "+rmt_rte_rec": 0.1148},   # +rmt_rte_rec Brier WORSE (p=0.037)
+    "veto_random": {"fpr": [0.1542, 0.0672], "precision@0.7": [0.9037, 0.9523],
+                    "coverage@0.7": [0.4534, 0.1789], "auc": [0.9179, 0.9007],
+                    "matched_coverage_precision": [0.9871, 0.9523]},         # veto worse at matched coverage
+    "veto_scaffold": {"auc": [0.8232, 0.7509], "matched_coverage_precision": [0.7717, 0.6969]},
+    "dmpnn_blend_rmt_helps": {"blend_roc_auc": [0.9343, 0.9415], "blend_pr_auc": [0.9485, 0.9543]},  # split_00
+    "verdict": "docking/RMT-RTE does not improve the HGB analogue's confidence in either regime; the veto "
+               "is a precision/operating-point tradeoff, not a calibration gain. RMT's real benefit is on "
+               "the graph-net stack (DMPNN/blend), where it lifts ROC-AUC 0.9343->0.9415.",
+}
+
 # Section 3.4 candidates
 CANDIDATES = {"n_high_conf": 1010, "fraction": 0.4097, "outside_ad_fraction": 0.5213}
 

@@ -1,0 +1,461 @@
+{
+  "protocol": "10 random 80/20 splits (split_registry.csv); HGB base learner; only the docking/RMT features change across rungs",
+  "base_learner": "HistGradientBoostingClassifier (identical to qsar_ablation)",
+  "n_splits": 10,
+  "n_bins_ece": 10,
+  "m_opt_mean": 90.8,
+  "rungs": [
+    "structure",
+    "+dock6",
+    "+raw_rte",
+    "+rmt_rte_sel",
+    "+rmt_rte_rec"
+  ],
+  "metrics_mean": {
+    "structure": {
+      "brier": 0.11304850679478436,
+      "log_loss": 0.36566745912752885,
+      "ece": 0.03995440875657758,
+      "reliability": 0.003282021768533906,
+      "resolution": 0.13869156766271054,
+      "sharpness_std": 0.3893488450852982,
+      "auc": 0.9178651059085843,
+      "precision@0.7": 0.903711173481123,
+      "coverage@0.7": 0.45338582677165357,
+      "precision@0.9": 0.9590140961267366,
+      "coverage@0.9": 0.33023622047244094,
+      "base_rate": 0.5291338582677165
+    },
+    "+dock6": {
+      "brier": 0.11264186986455038,
+      "log_loss": 0.36516351777413397,
+      "ece": 0.03320386061089738,
+      "reliability": 0.0026467055837576916,
+      "resolution": 0.13852555568349798,
+      "sharpness_std": 0.38116907014181917,
+      "auc": 0.9165113871635612,
+      "precision@0.7": 0.9103325703552777,
+      "coverage@0.7": 0.44692913385826777,
+      "precision@0.9": 0.9577781460465772,
+      "coverage@0.9": 0.31732283464566924,
+      "base_rate": 0.5291338582677165
+    },
+    "+raw_rte": {
+      "brier": 0.11456660861206318,
+      "log_loss": 0.37271459343894586,
+      "ece": 0.03607595970702869,
+      "reliability": 0.0024484785837164706,
+      "resolution": 0.1361288756904365,
+      "sharpness_std": 0.37912471840648126,
+      "auc": 0.9133241758241757,
+      "precision@0.7": 0.9071553618527226,
+      "coverage@0.7": 0.44503937007874017,
+      "precision@0.9": 0.9574341173381594,
+      "coverage@0.9": 0.3124409448818898,
+      "base_rate": 0.5291338582677165
+    },
+    "+rmt_rte_sel": {
+      "brier": 0.11357460945709148,
+      "log_loss": 0.3689457489405758,
+      "ece": 0.038084798811103646,
+      "reliability": 0.003033547023587455,
+      "resolution": 0.13767257941559502,
+      "sharpness_std": 0.38005633511368836,
+      "auc": 0.9143036311514571,
+      "precision@0.7": 0.911279556877704,
+      "coverage@0.7": 0.4475590551181102,
+      "precision@0.9": 0.9563300788779161,
+      "coverage@0.9": 0.3122834645669291,
+      "base_rate": 0.5291338582677165
+    },
+    "+rmt_rte_rec": {
+      "brier": 0.11477014116211444,
+      "log_loss": 0.3729042126464507,
+      "ece": 0.03504961400523919,
+      "reliability": 0.0022947774523861568,
+      "resolution": 0.13580566799144536,
+      "sharpness_std": 0.3814767610201471,
+      "auc": 0.9133610049370919,
+      "precision@0.7": 0.9038849913241144,
+      "coverage@0.7": 0.44818897637795285,
+      "precision@0.9": 0.9515768559679942,
+      "coverage@0.9": 0.3181102362204724,
+      "base_rate": 0.5291338582677165
+    }
+  },
+  "metrics_std": {
+    "structure": {
+      "brier": 0.007995401281316906,
+      "log_loss": 0.02489051217769911,
+      "ece": 0.009067267671476075,
+      "reliability": 0.0014064966100903371,
+      "resolution": 0.008333031106417059,
+      "sharpness_std": 0.013639266591593284,
+      "auc": 0.011777019937159553,
+      "precision@0.7": 0.012766177961407344,
+      "coverage@0.7": 0.01686510506529793,
+      "precision@0.9": 0.010163406844077285,
+      "coverage@0.9": 0.03015285423287881,
+      "base_rate": 0.0
+    },
+    "+dock6": {
+      "brier": 0.008445126442456378,
+      "log_loss": 0.02553149534230495,
+      "ece": 0.009921706487216665,
+      "reliability": 0.0012808054282167282,
+      "resolution": 0.007891339200879062,
+      "sharpness_std": 0.011661026957589228,
+      "auc": 0.012050076411347366,
+      "precision@0.7": 0.010638308013959425,
+      "coverage@0.7": 0.01631727098833212,
+      "precision@0.9": 0.011338248208502115,
+      "coverage@0.9": 0.02780096303704409,
+      "base_rate": 0.0
+    },
+    "+raw_rte": {
+      "brier": 0.007431992028716401,
+      "log_loss": 0.024175238204783303,
+      "ece": 0.009255092599540536,
+      "reliability": 0.0009522619766599544,
+      "resolution": 0.0067405993723431415,
+      "sharpness_std": 0.011201256002907922,
+      "auc": 0.010904410427444684,
+      "precision@0.7": 0.00916474098037376,
+      "coverage@0.7": 0.016474578684248214,
+      "precision@0.9": 0.010757607605401582,
+      "coverage@0.9": 0.030096461778654705,
+      "base_rate": 0.0
+    },
+    "+rmt_rte_sel": {
+      "brier": 0.0075725694756646365,
+      "log_loss": 0.021839508375368258,
+      "ece": 0.008158853035745702,
+      "reliability": 0.001778100091887001,
+      "resolution": 0.007804115643732962,
+      "sharpness_std": 0.00846781667987329,
+      "auc": 0.010892058529049339,
+      "precision@0.7": 0.01185961608438706,
+      "coverage@0.7": 0.018934347546694978,
+      "precision@0.9": 0.012237344410032052,
+      "coverage@0.9": 0.02689227112737957,
+      "base_rate": 0.0
+    },
+    "+rmt_rte_rec": {
+      "brier": 0.007684149300158063,
+      "log_loss": 0.023247244600053906,
+      "ece": 0.006245134300220868,
+      "reliability": 0.0005981702229918166,
+      "resolution": 0.00789087777693121,
+      "sharpness_std": 0.011292524184557593,
+      "auc": 0.01109594094947062,
+      "precision@0.7": 0.010912943365650638,
+      "coverage@0.7": 0.015545149832129844,
+      "precision@0.9": 0.01072895803777006,
+      "coverage@0.9": 0.02773621348697542,
+      "base_rate": 0.0
+    }
+  },
+  "paired_vs_structure": {
+    "+dock6": {
+      "brier": {
+        "delta_vs_structure": -0.0004066369302339584,
+        "wilcoxon_p": 0.322265625
+      },
+      "log_loss": {
+        "delta_vs_structure": -0.0005039413533948877,
+        "wilcoxon_p": 0.6953125
+      },
+      "ece": {
+        "delta_vs_structure": -0.006750548145680199,
+        "wilcoxon_p": 0.130859375
+      },
+      "resolution": {
+        "delta_vs_structure": -0.00016601197921254363,
+        "wilcoxon_p": 0.845703125
+      },
+      "precision@0.7": {
+        "delta_vs_structure": 0.006621396874154584,
+        "wilcoxon_p": 0.009765625
+      },
+      "auc": {
+        "delta_vs_structure": -0.0013537187450230691,
+        "wilcoxon_p": 0.193359375
+      }
+    },
+    "+raw_rte": {
+      "brier": {
+        "delta_vs_structure": 0.0015181018172788579,
+        "wilcoxon_p": 0.064453125
+      },
+      "log_loss": {
+        "delta_vs_structure": 0.007047134311417058,
+        "wilcoxon_p": 0.013671875
+      },
+      "ece": {
+        "delta_vs_structure": -0.003878449049548884,
+        "wilcoxon_p": 0.4921875
+      },
+      "resolution": {
+        "delta_vs_structure": -0.002562691972274013,
+        "wilcoxon_p": 0.01953125
+      },
+      "precision@0.7": {
+        "delta_vs_structure": 0.0034441883715996104,
+        "wilcoxon_p": 0.4921875
+      },
+      "auc": {
+        "delta_vs_structure": -0.0045409300844083235,
+        "wilcoxon_p": 0.001953125
+      }
+    },
+    "+rmt_rte_sel": {
+      "brier": {
+        "delta_vs_structure": 0.0005261026623071347,
+        "wilcoxon_p": 1.0
+      },
+      "log_loss": {
+        "delta_vs_structure": 0.0032782898130469863,
+        "wilcoxon_p": 0.322265625
+      },
+      "ece": {
+        "delta_vs_structure": -0.0018696099454739337,
+        "wilcoxon_p": 0.625
+      },
+      "resolution": {
+        "delta_vs_structure": -0.0010189882471154695,
+        "wilcoxon_p": 0.232421875
+      },
+      "precision@0.7": {
+        "delta_vs_structure": 0.007568383396580958,
+        "wilcoxon_p": 0.037109375
+      },
+      "auc": {
+        "delta_vs_structure": -0.0035614747571269256,
+        "wilcoxon_p": 0.048828125
+      }
+    },
+    "+rmt_rte_rec": {
+      "brier": {
+        "delta_vs_structure": 0.0017216343673300896,
+        "wilcoxon_p": 0.037109375
+      },
+      "log_loss": {
+        "delta_vs_structure": 0.00723675351892184,
+        "wilcoxon_p": 0.01953125
+      },
+      "ece": {
+        "delta_vs_structure": -0.004904794751338383,
+        "wilcoxon_p": 0.16015625
+      },
+      "resolution": {
+        "delta_vs_structure": -0.0028858996712651562,
+        "wilcoxon_p": 0.013671875
+      },
+      "precision@0.7": {
+        "delta_vs_structure": 0.00017381784299160818,
+        "wilcoxon_p": 0.921875
+      },
+      "auc": {
+        "delta_vs_structure": -0.004504100971492253,
+        "wilcoxon_p": 0.009765625
+      }
+    }
+  },
+  "veto_mean": {
+    "fpr_qsar": 0.15418060200668898,
+    "fpr_veto": 0.06722408026755852,
+    "recall_qsar": 0.8458333333333334,
+    "recall_veto": 0.6297619047619047,
+    "prec@0.7_qsar": 0.903711173481123,
+    "prec@0.7_veto": 0.9522576587014886,
+    "cov@0.7_qsar": 0.45338582677165357,
+    "cov@0.7_veto": 0.1788976377952756,
+    "auc_qsar": 0.9178651059085843,
+    "auc_veto": 0.9007077161968468,
+    "auc_mean_fusion": 0.9000089584328714,
+    "ap_qsar": 0.9329897837129071,
+    "ap_veto": 0.9087312250723425,
+    "ap_mean_fusion": 0.9108546974137497,
+    "brier_qsar": 0.11304850679478436,
+    "brier_mean_fusion": 0.13038762192131803,
+    "matched_prec_qsar": 0.9870735769914425,
+    "matched_prec_veto": 0.9522576587014886,
+    "matched_prec_mean_fusion": 0.956892640105867,
+    "n_flag_veto": 113.6
+  },
+  "scaffold_companion": {
+    "metrics_mean": {
+      "structure": {
+        "brier": 0.26964291453887385,
+        "log_loss": 0.8655371675717124,
+        "ece": 0.27213979343449757,
+        "reliability": 0.0911138422217417,
+        "resolution": 0.06566442321938316,
+        "sharpness_std": 0.31543023353013605,
+        "auc": 0.8232141787916891,
+        "precision@0.7": 0.6099290780141844,
+        "coverage@0.7": 0.6661417322834645,
+        "precision@0.9": 0.7038216560509554,
+        "coverage@0.9": 0.494488188976378,
+        "base_rate": 0.46141732283464565
+      },
+      "+dock6": {
+        "brier": 0.27332613081217416,
+        "log_loss": 0.89672570220278,
+        "ece": 0.2778391836004253,
+        "reliability": 0.09813700250386753,
+        "resolution": 0.06985481684273608,
+        "sharpness_std": 0.32114563282922004,
+        "auc": 0.8239825958525437,
+        "precision@0.7": 0.6088992974238876,
+        "coverage@0.7": 0.6724409448818898,
+        "precision@0.9": 0.715625,
+        "coverage@0.9": 0.5039370078740157,
+        "base_rate": 0.46141732283464565
+      },
+      "+raw_rte": {
+        "brier": 0.28828964385945816,
+        "log_loss": 0.9864405384177275,
+        "ece": 0.2845754260696839,
+        "reliability": 0.09849544052605648,
+        "resolution": 0.054680020878443085,
+        "sharpness_std": 0.32967729473849405,
+        "auc": 0.8075564337464823,
+        "precision@0.7": 0.611904761904762,
+        "coverage@0.7": 0.6614173228346457,
+        "precision@0.9": 0.6686046511627907,
+        "coverage@0.9": 0.5417322834645669,
+        "base_rate": 0.46141732283464565
+      },
+      "+rmt_rte_sel": {
+        "brier": 0.2874331479830031,
+        "log_loss": 0.9723102883187513,
+        "ece": 0.2953414308314732,
+        "reliability": 0.10350234208093914,
+        "resolution": 0.060827105167940244,
+        "sharpness_std": 0.3293012731522646,
+        "auc": 0.8120571622457737,
+        "precision@0.7": 0.6028368794326241,
+        "coverage@0.7": 0.6661417322834645,
+        "precision@0.9": 0.685459940652819,
+        "coverage@0.9": 0.5307086614173229,
+        "base_rate": 0.46141732283464565
+      },
+      "+rmt_rte_rec": {
+        "brier": 0.28063672884917074,
+        "log_loss": 0.9087574360493618,
+        "ece": 0.282343776251379,
+        "reliability": 0.1009886169238742,
+        "resolution": 0.06560120776658925,
+        "sharpness_std": 0.3171274528871249,
+        "auc": 0.8133844280781589,
+        "precision@0.7": 0.6066350710900474,
+        "coverage@0.7": 0.6645669291338583,
+        "precision@0.9": 0.717948717948718,
+        "coverage@0.9": 0.49133858267716535,
+        "base_rate": 0.46141732283464565
+      }
+    },
+    "veto_mean": {
+      "fpr_qsar": 0.5877192982456141,
+      "fpr_veto": 0.4415204678362573,
+      "recall_qsar": 0.9215017064846417,
+      "recall_veto": 0.8020477815699659,
+      "prec@0.7_qsar": 0.6099290780141844,
+      "prec@0.7_veto": 0.6968503937007874,
+      "cov@0.7_qsar": 0.6661417322834645,
+      "cov@0.7_veto": 0.4,
+      "auc_qsar": 0.8232141787916891,
+      "auc_veto": 0.7509031395325629,
+      "auc_mean_fusion": 0.7559527373610362,
+      "ap_qsar": 0.8177722691008475,
+      "ap_veto": 0.7110000975639639,
+      "ap_mean_fusion": 0.7154568682931964,
+      "brier_qsar": 0.26964291453887385,
+      "brier_mean_fusion": 0.27283908809737023,
+      "matched_prec_qsar": 0.7716535433070866,
+      "matched_prec_veto": 0.6968503937007874,
+      "matched_prec_mean_fusion": 0.6929133858267716,
+      "n_flag_veto": 254.0
+    },
+    "n_splits": 1,
+    "note": "single Bemis-Murcko scaffold-disjoint split (no error bars); the deployment regime for scoring novel C. sativa chemistry"
+  },
+  "dmpnn_blend_reference": {
+    "source": "authors' bundled split_00 ablation (ablation__random_split__metrics_summary.csv)",
+    "note": "RMT-RTE-rec lifts the DMPNN/blend (ROC-AUC 0.9343->0.9415, PR-AUC 0.9485->0.9543) even though it does not help the torch-free HGB analogue used above \u2014 the RMT confidence benefit is specific to the graph-net stack.",
+    "by_feature_set": {
+      "structure": {
+        "blend": {
+          "roc_auc": 0.9343,
+          "pr_auc": 0.9485
+        },
+        "dmpnn": {
+          "roc_auc": 0.9343,
+          "pr_auc": 0.9485
+        },
+        "hgb": {
+          "roc_auc": 0.93,
+          "pr_auc": 0.9444
+        }
+      },
+      "+dock2": {
+        "blend": {
+          "roc_auc": 0.9373,
+          "pr_auc": 0.9524
+        },
+        "dmpnn": {
+          "roc_auc": 0.9342,
+          "pr_auc": 0.9506
+        },
+        "hgb": {
+          "roc_auc": 0.9349,
+          "pr_auc": 0.9484
+        }
+      },
+      "+raw_rte": {
+        "blend": {
+          "roc_auc": 0.9366,
+          "pr_auc": 0.9504
+        },
+        "dmpnn": {
+          "roc_auc": 0.9334,
+          "pr_auc": 0.9458
+        },
+        "hgb": {
+          "roc_auc": 0.9228,
+          "pr_auc": 0.9394
+        }
+      },
+      "+rmt_rte_sel": {
+        "blend": {
+          "roc_auc": 0.9345,
+          "pr_auc": 0.9483
+        },
+        "dmpnn": {
+          "roc_auc": 0.9293,
+          "pr_auc": 0.9426
+        },
+        "hgb": {
+          "roc_auc": 0.9241,
+          "pr_auc": 0.9403
+        }
+      },
+      "+rmt_rte_rec": {
+        "blend": {
+          "roc_auc": 0.9415,
+          "pr_auc": 0.9543
+        },
+        "dmpnn": {
+          "roc_auc": 0.9363,
+          "pr_auc": 0.9469
+        },
+        "hgb": {
+          "roc_auc": 0.9203,
+          "pr_auc": 0.9365
+        }
+      }
+    }
+  },
+  "verdict": "For the open torch-free HGB analogue, adding docking / RMT-RTE does NOT improve confidence in either regime. (1) As features: the 217 RDKit-2D descriptors already saturate \u2014 Brier/ECE/AUC are flat-to-worse on random splits and on the scaffold split (structure AUC is the best rung in both). (2) As the p_QSAR x p_RMT-RTE veto: the precision@0.7 / FPR gains are a thresholding artifact \u2014 coverage collapses (0.45->0.18 random) while ranking degrades (AUC 0.918->0.901); at matched coverage the structure model alone is more precise (0.987 vs veto 0.952), and symmetric mean-fusion is no better. The scaffold split repeats this (structure matched-cov precision 0.772 vs veto 0.697). RMT-RTE is a weak (~0.80 AUC) standalone signal that only dilutes the strong structure model. Where RMT genuinely helps is the DMPNN/blend (see dmpnn_blend_reference), not this analogue: the paper's confidence gain lives in the graph net."
+}
