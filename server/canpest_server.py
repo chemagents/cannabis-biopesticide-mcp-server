@@ -17,7 +17,7 @@ import logging
 
 from fastmcp import FastMCP
 
-from . import docking, models, plotting, reference
+from . import confidence, docking, models, plotting, reference
 from .config import get_settings
 from .dataset import PROTEINS, load_dataset
 
@@ -134,6 +134,55 @@ def docking_veto() -> dict:
                               f"{v['recall_after_veto']:.2f}) — a physical-consistency filter, not an average."},
         "metadata": {"paper": {"fpr_before": reference.QSAR["fpr_before"],
                                "fpr_after_veto": reference.QSAR["fpr_after_veto"]}, "reference": PAPER},
+    }
+
+
+@mcp.tool()
+def confidence_ablation() -> dict:
+    """Does docking / RMT-RTE make the QSAR model *more confident*? Calibration ablation (Section 3.3).
+
+    An honest, adversarial test of the claim "adding RMT / docking-scores improves model confidence",
+    orthogonal to ROC-AUC. Same HGB base learner and feature ladder as qsar_model_quality (only the
+    features change), scored with calibration + sharpness + high-confidence-precision metrics over the
+    10 random splits and the scaffold split. Bundled result; regenerate via `python -m server.confidence`.
+    """
+    res = confidence.load_confidence_ablation()
+    if res is None:
+        return {"answer": {"error": "confidence_ablation.json not bundled — run `python -m server.confidence`."},
+                "metadata": {"reference": PAPER}}
+    mm = res["metrics_mean"]
+    v = res["veto_mean"]
+    fpr_red = 100.0 * (v["fpr_qsar"] - v["fpr_veto"]) / max(v["fpr_qsar"], 1e-9)
+    ladder = {r: {"brier": round(mm[r]["brier"], 4), "ece": round(mm[r]["ece"], 4),
+                  "auc": round(mm[r]["auc"], 4), "resolution": round(mm[r]["resolution"], 4),
+                  "precision@0.7": round(mm[r]["precision@0.7"], 4)} for r in res["rungs"]}
+    return {
+        "answer": {
+            "protocol": res["protocol"],
+            "ladder_mean_random": ladder,
+            "paired_vs_structure": res["paired_vs_structure"],
+            "veto_random": {
+                "fpr": [round(v["fpr_qsar"], 4), round(v["fpr_veto"], 4)],
+                "fpr_reduction_pct": round(fpr_red, 1),
+                "precision@0.7": [round(v["prec@0.7_qsar"], 4), round(v["prec@0.7_veto"], 4)],
+                "coverage@0.7": [round(v["cov@0.7_qsar"], 4), round(v["cov@0.7_veto"], 4)],
+                "auc": [round(v["auc_qsar"], 4), round(v["auc_veto"], 4)],
+                "matched_coverage_precision": [round(v["matched_prec_qsar"], 4), round(v["matched_prec_veto"], 4)],
+                "mean_fusion_auc": round(v["auc_mean_fusion"], 4),
+            },
+            "scaffold_companion": res.get("scaffold_companion"),
+            "dmpnn_blend_reference": res["dmpnn_blend_reference"],
+            "finding": res["verdict"],
+        },
+        "metadata": {
+            "reliability_figure": "server/data/reference/confidence_reliability.png",
+            "base_learner": res["base_learner"], "n_splits": res["n_splits"],
+            "paper_veto": {"fpr_before": reference.QSAR["fpr_before"],
+                           "fpr_after_veto": reference.QSAR["fpr_after_veto"]},
+            "reference": PAPER,
+            "caveat": "HGB analogue isolates the feature contribution; the exact DMPNN-SD stack is the "
+                      "model where RMT-RTE actually lifts discrimination (dmpnn_blend_reference).",
+        },
     }
 
 

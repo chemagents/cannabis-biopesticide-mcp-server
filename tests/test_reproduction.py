@@ -58,6 +58,23 @@ def test_docking_veto_reduces_fpr():
     assert v["fpr_reduction_pct"] >= 40                   # paper ~60%
 
 
+def test_confidence_ablation_bundled_and_honest():
+    """The bundled confidence ablation ships and records the honest (adversarial) conclusion."""
+    from server import confidence
+    res = confidence.load_confidence_ablation()
+    assert res is not None                                        # confidence_ablation.json is bundled
+    mm = res["metrics_mean"]
+    # structure descriptors saturate: adding RMT-RTE as features does not beat structure on ROC-AUC
+    assert mm["+rmt_rte_rec"]["auc"] <= mm["structure"]["auc"] + 1e-6
+    # the veto is a thresholding trade, not a ranking/confidence gain
+    v = res["veto_mean"]
+    assert v["auc_veto"] <= v["auc_qsar"]                         # veto ranks no better than structure
+    assert v["matched_prec_qsar"] >= v["matched_prec_veto"]       # structure purer at matched coverage
+    # RMT *does* help the graph-net stack (authors' bundled split_00 ablation)
+    ref = res["dmpnn_blend_reference"]["by_feature_set"]
+    assert ref["+rmt_rte_rec"]["blend"]["roc_auc"] > ref["structure"]["blend"]["roc_auc"]
+
+
 @pytest.mark.slow
 def test_candidate_fraction():
     res = models.predict_biopesticides()

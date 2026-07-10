@@ -33,6 +33,7 @@ expensive docking output; recompute the analyses).
 | `qsar_model_quality` | §3.3 | RDKit2D+RMT ablation; residue-level docking baseline (CB-SD) |
 | `model_stack` | §3.3 | DMPNN+HGB soft-voting stack: component vs blend OOF-CV (blend > DMPNN > HGB) |
 | `docking_veto` | §3.3 | docking-consistency veto: FPR reduction (p_QSAR × p_RMT-RTE) |
+| `confidence_ablation` | §3.3 | does docking/RMT-RTE improve *confidence*? honest calibration ablation ([CONFIDENCE.md](CONFIDENCE.md)) |
 | `predict_biopesticides` | §3.4 | metabolite biopesticide probabilities + AD → candidate count |
 | `chemical_space` | Fig S2 | metabolites-vs-pesticides t-SNE map |
 | `tox_ecotox_reference` | §2.6 / §3.5 | open tox reproduction (TOXRIC+ECOTOX ensemble) vs Syntelly benchmark + safety comparison |
