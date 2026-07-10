@@ -77,23 +77,26 @@ The open ensembles (final models fit on all TOXRIC/ECOTOX data per endpoint) wer
 `server/data/tox/table3_metabolites_open.csv` (top-10 candidates), `table4_pesticides_open.csv`
 (10 pesticides), `section35_open.json` (full stats).
 
-**On the full representative sets (2749 metabolites vs 1680 pesticides) the paper's safety conclusion
-reproduces:**
+**On the full representative sets the paper's safety conclusion reproduces** (metabolites after
+stereo-free dedup + removing 384 structures shared with the labelled pesticides — N=2283 vs raw 2749;
+pesticides N=1680):
 
 | Endpoint | metabolites | pesticides | paper (Syntelly) |
 |---|---|---|---|
-| median oral LD50 | 1617 mg/kg | 911 mg/kg | 1480 vs 1250 |
-| hepatotoxicity (% toxic) | 33.7% | 64.0% | 15% vs 81% |
-| DILI (% toxic) | 33.7% | 64.0% | — |
-| Ames (% toxic) | 12.5% | 14.5% | ~tied |
-| carcinogenicity (% toxic) | 15.3% | 12.9% | ~tied |
+| median oral LD50 | 1782 mg/kg | 911 mg/kg | 1480 vs 1250 |
+| hepatotoxicity (% toxic) | 31.9% | 64.0% | 15% vs 81% |
+| DILI (% toxic) | 31.9% | 64.0% | — |
+| Ames (% toxic) | 11.6% | 14.5% | ~tied |
+| carcinogenicity (% toxic) | 16.2% | 12.9% | ~tied |
 
-Direction and ~2× separation match the paper; magnitudes are compressed (the open TDC DILI model is
-milder/less-separating than Syntelly's). **Caveat:** the top-10 DMPNN candidates are structurally
-pesticide-like (pyrethroid / fipronil / organophosphate / avermectin scaffolds) and therefore look
-hepatotoxic (70%) — they are the exception, not the metabolome; the full-set comparison is the fair
-test. Reproductive is excluded (degenerate); rat LD50 shares the mouse acute model; extreme aquatic
-LC50 on large glycosides is soft (applicability-domain extrapolation).
+Direction and ~2× separation match the paper; magnitudes are compressed because the open TDC-DILI
+model is milder/less-separating than Syntelly's. **Data-cleanliness was ruled out as the cause:**
+stereo-dedup is neutral (hepatotox 33.7 → 33.9%) and removing the 384 pesticide-identical structures
+moves it only ~2 pts (→ 31.9%, LD50 → 1782), so the residual gap to the paper's 15% is model
+calibration, not contamination. **Caveats:** the top-10 DMPNN candidates are pesticide-like scaffolds
+(pyrethroid / fipronil / organophosphate / avermectin) and look hepatotoxic (70%) — the exception, not
+the metabolome; reproductive is excluded (degenerate); rat LD50 shares the mouse acute model; extreme
+aquatic LC50 on large glycosides is soft.
 
 ## Reproduce
 
