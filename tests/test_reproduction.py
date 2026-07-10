@@ -74,6 +74,12 @@ def test_confidence_ablation_bundled_and_honest():
     kf = res["dmpnn_stack_rmt_kfold"]["paired_kfold"]["rmt_rte_rdkit_only"]["by_split"]
     assert kf["random"]["blend"]["rmt_rte_rec_roc"] < kf["random"]["blend"]["baseline_roc"]
     assert kf["scaffold"]["blend"]["rmt_rte_rec_roc"] < kf["scaffold"]["blend"]["baseline_roc"]
+    # and RELIABILITY (OOF re-run): +rmt is no better at matched coverage — precision@0.7 down, Brier up
+    rel = confidence._load_stack_reliability()["by_split"]
+    for sp in ("random", "scaffold"):
+        bl = rel[sp]["blend"]
+        assert bl["precision@0.7"][1] <= bl["precision@0.7"][0] + 1e-9   # +rmt precision no higher
+        assert bl["brier"][1] >= bl["brier"][0] - 1e-9                   # +rmt Brier no lower (worse/equal)
 
 
 @pytest.mark.slow
