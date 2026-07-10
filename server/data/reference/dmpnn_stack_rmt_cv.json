@@ -1,0 +1,174 @@
+{
+  "source": "team's Activity/dmpnn/eval_rmt_rte.py \u2014 honest PAIRED k-fold CV (per fold: same train/val/test partition, same RMT fit, same DMPNN seeds; only the extra feature block differs)",
+  "arms": "baseline = dock_eng+rdkit; rmt_rte_rec = baseline + RMT-reconstructed residue-term energies",
+  "finding": "adding rmt_rte_rec LOWERS ROC-AUC & PR-AUC for DMPNN, HGB and the blend on BOTH random and scaffold, for every base-feature config. RMT-RTE does not help the stack either. The single split_00 blend number (0.9343->0.9415) was a one-split artifact; k-fold refutes it.",
+  "paired_kfold": {
+    "rmt_rte_rdkit_only": {
+      "base_features": "rdkit",
+      "by_split": {
+        "random": {
+          "dmpnn": {
+            "baseline_roc": 0.926,
+            "rmt_rte_rec_roc": 0.9175,
+            "delta_roc": -0.0085,
+            "baseline_pr": 0.9393,
+            "rmt_rte_rec_pr": 0.9309
+          },
+          "hgb": {
+            "baseline_roc": 0.9159,
+            "rmt_rte_rec_roc": 0.9064,
+            "delta_roc": -0.0095,
+            "baseline_pr": 0.9305,
+            "rmt_rte_rec_pr": 0.9233
+          },
+          "blend": {
+            "baseline_roc": 0.9313,
+            "rmt_rte_rec_roc": 0.9253,
+            "delta_roc": -0.006,
+            "baseline_pr": 0.9451,
+            "rmt_rte_rec_pr": 0.9391
+          }
+        },
+        "scaffold": {
+          "dmpnn": {
+            "baseline_roc": 0.9084,
+            "rmt_rte_rec_roc": 0.902,
+            "delta_roc": -0.0064,
+            "baseline_pr": 0.9297,
+            "rmt_rte_rec_pr": 0.9208
+          },
+          "hgb": {
+            "baseline_roc": 0.8989,
+            "rmt_rte_rec_roc": 0.8951,
+            "delta_roc": -0.0038,
+            "baseline_pr": 0.9164,
+            "rmt_rte_rec_pr": 0.9129
+          },
+          "blend": {
+            "baseline_roc": 0.9149,
+            "rmt_rte_rec_roc": 0.9108,
+            "delta_roc": -0.0041,
+            "baseline_pr": 0.9333,
+            "rmt_rte_rec_pr": 0.9276
+          }
+        }
+      }
+    },
+    "rmt_rte_integration": {
+      "base_features": "integration",
+      "by_split": {
+        "random": {
+          "dmpnn": {
+            "baseline_roc": 0.9247,
+            "rmt_rte_rec_roc": 0.9215,
+            "delta_roc": -0.0032,
+            "baseline_pr": 0.9388,
+            "rmt_rte_rec_pr": 0.9355
+          },
+          "hgb": {
+            "baseline_roc": 0.9158,
+            "rmt_rte_rec_roc": 0.9057,
+            "delta_roc": -0.0101,
+            "baseline_pr": 0.9304,
+            "rmt_rte_rec_pr": 0.9225
+          },
+          "blend": {
+            "baseline_roc": 0.93,
+            "rmt_rte_rec_roc": 0.9265,
+            "delta_roc": -0.0035,
+            "baseline_pr": 0.944,
+            "rmt_rte_rec_pr": 0.9412
+          }
+        },
+        "scaffold": {
+          "dmpnn": {
+            "baseline_roc": 0.9061,
+            "rmt_rte_rec_roc": 0.9038,
+            "delta_roc": -0.0023,
+            "baseline_pr": 0.9263,
+            "rmt_rte_rec_pr": 0.9251
+          },
+          "hgb": {
+            "baseline_roc": 0.8995,
+            "rmt_rte_rec_roc": 0.8913,
+            "delta_roc": -0.0082,
+            "baseline_pr": 0.919,
+            "rmt_rte_rec_pr": 0.9097
+          },
+          "blend": {
+            "baseline_roc": 0.9125,
+            "rmt_rte_rec_roc": 0.9102,
+            "delta_roc": -0.0023,
+            "baseline_pr": 0.9315,
+            "rmt_rte_rec_pr": 0.9284
+          }
+        }
+      }
+    },
+    "rmt_rte_global_dock": {
+      "base_features": "dock_eng+rdkit",
+      "by_split": {
+        "random": {
+          "dmpnn": {
+            "baseline_roc": 0.9275,
+            "rmt_rte_rec_roc": 0.9231,
+            "delta_roc": -0.0044,
+            "baseline_pr": 0.9407,
+            "rmt_rte_rec_pr": 0.935
+          },
+          "hgb": {
+            "baseline_roc": 0.9158,
+            "rmt_rte_rec_roc": 0.9081,
+            "delta_roc": -0.0077,
+            "baseline_pr": 0.9304,
+            "rmt_rte_rec_pr": 0.9247
+          },
+          "blend": {
+            "baseline_roc": 0.9317,
+            "rmt_rte_rec_roc": 0.9277,
+            "delta_roc": -0.004,
+            "baseline_pr": 0.9451,
+            "rmt_rte_rec_pr": 0.9423
+          }
+        },
+        "scaffold": {
+          "dmpnn": {
+            "baseline_roc": 0.9061,
+            "rmt_rte_rec_roc": 0.8984,
+            "delta_roc": -0.0077,
+            "baseline_pr": 0.926,
+            "rmt_rte_rec_pr": 0.9184
+          },
+          "hgb": {
+            "baseline_roc": 0.8995,
+            "rmt_rte_rec_roc": 0.8916,
+            "delta_roc": -0.0079,
+            "baseline_pr": 0.919,
+            "rmt_rte_rec_pr": 0.9088
+          },
+          "blend": {
+            "baseline_roc": 0.9126,
+            "rmt_rte_rec_roc": 0.9088,
+            "delta_roc": -0.0038,
+            "baseline_pr": 0.9313,
+            "rmt_rte_rec_pr": 0.9264
+          }
+        }
+      }
+    }
+  },
+  "residue_only_hgb_roc": {
+    "random": {
+      "rdkit": 0.9207,
+      "rte_raw": 0.7932,
+      "rte_rmt_sel": 0.7837,
+      "rte_rmt_rec": 0.76
+    },
+    "scaffold": {
+      "rdkit": 0.907,
+      "rte_raw": 0.7716,
+      "rte_rmt_sel": 0.766,
+      "rte_rmt_rec": 0.7445
+    }
+  }
+}

@@ -2,8 +2,10 @@
 
 The paper's main model is a DMPNN (graph neural net) + GBM blend (ROC-AUC ~0.93). The open,
 torch-free analogue here is **HistGradientBoosting on RDKit-2D descriptors** (+ optional
-docking / RMT-RTE features), which the authors' own ablation shows reaches ROC-AUC ~0.93
-(rdkit2d 0.9343, rdkit2d_rmt_rec 0.9415). CB-SD = gradient boosting on the 6 docking scores
+docking / RMT-RTE features), which reaches ROC-AUC ~0.93 on the authors' 217 descriptors. Adding
+docking / RMT-RTE does not improve it — under honest k-fold CV RMT-RTE lowers ROC-AUC, on the
+DMPNN and the blend too (see confidence.py / CONFIDENCE.md; single-split 0.9415 was an artifact).
+CB-SD = gradient boosting on the 6 docking scores
 (the docking-only baseline, ROC-AUC ~0.68-0.80). An applicability-domain score (kNN k=5 +
 Gaussian) gives the per-compound "Probability" used to pick the >0.7 candidate set.
 """

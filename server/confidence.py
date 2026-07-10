@@ -233,26 +233,17 @@ def render_reliability(pooled: dict, png_path: Path) -> None:
     fig.tight_layout(); fig.savefig(png_path, dpi=150, bbox_inches="tight")
 
 
-def _load_blend_reference() -> dict:
-    """Authors' bundled split_00 ablation: blend/DMPNN/HGB ROC-AUC & PR-AUC per feature set.
+def _load_stack_rmt_kfold() -> dict:
+    """Team's PAIRED k-fold CV (Activity/dmpnn/eval_rmt_rte.py): does RMT-RTE help the DMPNN/stack?
 
-    Key reconciliation: RMT-RTE-rec lifts the *blend* and *DMPNN* discrimination even though it does
-    not help the HGB analogue used here — so the paper's RMT benefit is specific to the graph-net stack.
+    Bundled as reference_dir/dmpnn_stack_rmt_cv.json. Unlike the single split_00 ablation, this honest
+    k-fold CV shows adding rmt_rte_rec LOWERS ROC-AUC & PR-AUC for DMPNN, HGB and the blend on both the
+    random and scaffold splits, for every base-feature config — RMT-RTE does not help the stack either.
     """
-    import csv as _csv
-    path = Path(get_settings().reference_dir) / "ablation__random_split__metrics_summary.csv"
+    path = Path(get_settings().reference_dir) / "dmpnn_stack_rmt_cv.json"
     if not path.exists():
         return {}
-    fmap = {"rdkit2d": "structure", "rdkit2d_dock2": "+dock2", "rdkit2d_raw_rte": "+raw_rte",
-            "rdkit2d_rmt_sel": "+rmt_rte_sel", "rdkit2d_rmt_rec": "+rmt_rte_rec"}
-    out: dict[str, dict] = {}
-    for r in _csv.DictReader(path.read_text().splitlines()):
-        fs = fmap.get(r["feature_set"])
-        if fs is None:
-            continue
-        out.setdefault(fs, {})[r["model"]] = {"roc_auc": round(float(r["roc_auc"]), 4),
-                                              "pr_auc": round(float(r["pr_auc"]), 4)}
-    return out
+    return json.loads(path.read_text())
 
 
 def load_confidence_ablation() -> dict | None:
@@ -283,27 +274,22 @@ def main() -> None:
     except Exception as exc:  # noqa: BLE001
         res["scaffold_companion"] = {"error": str(exc)}
 
-    res["dmpnn_blend_reference"] = {
-        "source": "authors' bundled split_00 ablation (ablation__random_split__metrics_summary.csv)",
-        "note": "RMT-RTE-rec lifts the DMPNN/blend (ROC-AUC 0.9343->0.9415, PR-AUC 0.9485->0.9543) "
-                "even though it does not help the torch-free HGB analogue used above — the RMT confidence "
-                "benefit is specific to the graph-net stack.",
-        "by_feature_set": _load_blend_reference(),
-    }
+    res["dmpnn_stack_rmt_kfold"] = _load_stack_rmt_kfold()
     v, sv = res["veto_mean"], res.get("scaffold_companion", {}).get("veto_mean", {})
     res["verdict"] = (
-        "For the open torch-free HGB analogue, adding docking / RMT-RTE does NOT improve confidence in "
-        "either regime. (1) As features: the 217 RDKit-2D descriptors already saturate — Brier/ECE/AUC "
-        "are flat-to-worse on random splits and on the scaffold split (structure AUC is the best rung in "
-        "both). (2) As the p_QSAR x p_RMT-RTE veto: the precision@0.7 / FPR gains are a thresholding "
-        f"artifact — coverage collapses ({v['cov@0.7_qsar']:.2f}->{v['cov@0.7_veto']:.2f} random) while "
-        f"ranking degrades (AUC {v['auc_qsar']:.3f}->{v['auc_veto']:.3f}); at matched coverage the "
-        f"structure model alone is more precise ({v['matched_prec_qsar']:.3f} vs veto "
-        f"{v['matched_prec_veto']:.3f}), and symmetric mean-fusion is no better. The scaffold split "
-        f"repeats this (structure matched-cov precision {sv.get('matched_prec_qsar', float('nan')):.3f} vs "
-        f"veto {sv.get('matched_prec_veto', float('nan')):.3f}). RMT-RTE is a weak (~0.80 AUC) standalone "
-        "signal that only dilutes the strong structure model. Where RMT genuinely helps is the DMPNN/blend "
-        "(see dmpnn_blend_reference), not this analogue: the paper's confidence gain lives in the graph net."
+        "Adding docking / RMT-RTE does NOT improve model confidence, and this holds beyond the HGB "
+        "analogue. (1) As features on HGB: the 217 RDKit-2D descriptors saturate — Brier/ECE/AUC are "
+        "flat-to-worse on random and scaffold (structure is the best rung in both), and +rmt_rte_rec "
+        "worsens Brier (p=0.037). (2) As the p_QSAR x p_RMT-RTE veto: the precision@0.7 / FPR gains are a "
+        f"thresholding artifact — coverage collapses ({v['cov@0.7_qsar']:.2f}->{v['cov@0.7_veto']:.2f} "
+        f"random), ranking degrades (AUC {v['auc_qsar']:.3f}->{v['auc_veto']:.3f}), and at matched coverage "
+        f"structure alone is more precise ({v['matched_prec_qsar']:.3f} vs {v['matched_prec_veto']:.3f}); "
+        "mean-fusion is no better and the scaffold split repeats it. (3) On the DMPNN and the DMPNN+HGB "
+        "STACK: the team's paired k-fold CV (dmpnn_stack_rmt_kfold) shows rmt_rte_rec LOWERS ROC-AUC & "
+        "PR-AUC for all three models on both splits (blend 0.931->0.925 random, 0.915->0.911 scaffold) — "
+        "the earlier single split_00 blend number (0.9343->0.9415) was a one-split artifact. "
+        "RMT-reconstructed RTE is even weaker than raw RTE (0.76 vs 0.79 HGB ROC), so it only dilutes the "
+        "structure model. Net: RMT-RTE improves neither confidence nor discrimination on any model here."
     )
     (ref_dir / "confidence_ablation.json").write_text(json.dumps(res, indent=2))
 

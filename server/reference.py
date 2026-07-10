@@ -42,9 +42,11 @@ QSAR_STACK = {
 # ROC-AUC. HGB base learner + qsar_ablation feature ladder, calibration/sharpness/precision metrics
 # over the 10 random splits + the scaffold split. Bundled: server/data/reference/confidence_ablation.json
 # (+ confidence_reliability.png). Regenerate: python -m server.confidence. See CONFIDENCE.md.
-# Honest verdict: for the open torch-free HGB analogue it does NOT — structure descriptors saturate,
-# and the p_QSAR x p_RMT-RTE veto's precision@0.7/FPR gains are a thresholding artifact (at matched
-# coverage the structure model alone is more precise; veto AUC is lower). RMT helps only the DMPNN/blend.
+# Honest verdict: docking/RMT-RTE improves confidence on NO model here. On the HGB analogue structure
+# descriptors saturate and the veto's precision/FPR gains are a thresholding artifact (structure purer at
+# matched coverage). On the DMPNN and the DMPNN+HGB stack, the team's OWN paired k-fold CV
+# (dmpnn_stack_rmt_cv.json, from Activity/dmpnn/eval_rmt_rte.py) shows rmt_rte_rec LOWERS ROC-AUC/PR-AUC on
+# both splits. The single split_00 ablation (blend 0.9343->0.9415) was a one-split artifact.
 CONFIDENCE_ABLATION = {
     "protocol": "10 random 80/20 splits + 1 Bemis-Murcko scaffold split; HGB base learner; features vary",
     "random_ladder_auc": {"structure": 0.9179, "+dock6": 0.9165, "+raw_rte": 0.9133,
@@ -54,10 +56,15 @@ CONFIDENCE_ABLATION = {
                     "coverage@0.7": [0.4534, 0.1789], "auc": [0.9179, 0.9007],
                     "matched_coverage_precision": [0.9871, 0.9523]},         # veto worse at matched coverage
     "veto_scaffold": {"auc": [0.8232, 0.7509], "matched_coverage_precision": [0.7717, 0.6969]},
-    "dmpnn_blend_rmt_helps": {"blend_roc_auc": [0.9343, 0.9415], "blend_pr_auc": [0.9485, 0.9543]},  # split_00
-    "verdict": "docking/RMT-RTE does not improve the HGB analogue's confidence in either regime; the veto "
-               "is a precision/operating-point tradeoff, not a calibration gain. RMT's real benefit is on "
-               "the graph-net stack (DMPNN/blend), where it lifts ROC-AUC 0.9343->0.9415.",
+    # DMPNN + DMPNN/HGB stack, team's paired k-fold CV: adding rmt_rte_rec LOWERS blend ROC (baseline->+rmt)
+    "stack_rmt_kfold_blend_roc": {"random": [0.9313, 0.9253], "scaffold": [0.9149, 0.9108]},
+    "residue_only_hgb_roc_random": {"rdkit": 0.9207, "rte_raw": 0.7932, "rte_rmt_sel": 0.7837,
+                                    "rte_rmt_rec": 0.76},   # RMT reconstruction is the weakest RTE variant
+    "verdict": "docking/RMT-RTE improves confidence or discrimination on NO model — HGB, DMPNN, or the "
+               "DMPNN+HGB stack. On HGB the veto is a thresholding artifact (structure purer at matched "
+               "coverage). On the stack the team's paired k-fold CV shows rmt_rte_rec LOWERS blend ROC-AUC "
+               "(0.9313->0.9253 random, 0.9149->0.9108 scaffold); the split_00 0.9343->0.9415 was an "
+               "artifact. RMT-reconstructed RTE (0.76) is weaker than raw RTE (0.79), so it only dilutes.",
 }
 
 # Section 3.4 candidates

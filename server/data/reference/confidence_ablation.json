@@ -381,81 +381,179 @@
     "n_splits": 1,
     "note": "single Bemis-Murcko scaffold-disjoint split (no error bars); the deployment regime for scoring novel C. sativa chemistry"
   },
-  "dmpnn_blend_reference": {
-    "source": "authors' bundled split_00 ablation (ablation__random_split__metrics_summary.csv)",
-    "note": "RMT-RTE-rec lifts the DMPNN/blend (ROC-AUC 0.9343->0.9415, PR-AUC 0.9485->0.9543) even though it does not help the torch-free HGB analogue used above \u2014 the RMT confidence benefit is specific to the graph-net stack.",
-    "by_feature_set": {
-      "structure": {
-        "blend": {
-          "roc_auc": 0.9343,
-          "pr_auc": 0.9485
-        },
-        "dmpnn": {
-          "roc_auc": 0.9343,
-          "pr_auc": 0.9485
-        },
-        "hgb": {
-          "roc_auc": 0.93,
-          "pr_auc": 0.9444
+  "dmpnn_stack_rmt_kfold": {
+    "source": "team's Activity/dmpnn/eval_rmt_rte.py \u2014 honest PAIRED k-fold CV (per fold: same train/val/test partition, same RMT fit, same DMPNN seeds; only the extra feature block differs)",
+    "arms": "baseline = dock_eng+rdkit; rmt_rte_rec = baseline + RMT-reconstructed residue-term energies",
+    "finding": "adding rmt_rte_rec LOWERS ROC-AUC & PR-AUC for DMPNN, HGB and the blend on BOTH random and scaffold, for every base-feature config. RMT-RTE does not help the stack either. The single split_00 blend number (0.9343->0.9415) was a one-split artifact; k-fold refutes it.",
+    "paired_kfold": {
+      "rmt_rte_rdkit_only": {
+        "base_features": "rdkit",
+        "by_split": {
+          "random": {
+            "dmpnn": {
+              "baseline_roc": 0.926,
+              "rmt_rte_rec_roc": 0.9175,
+              "delta_roc": -0.0085,
+              "baseline_pr": 0.9393,
+              "rmt_rte_rec_pr": 0.9309
+            },
+            "hgb": {
+              "baseline_roc": 0.9159,
+              "rmt_rte_rec_roc": 0.9064,
+              "delta_roc": -0.0095,
+              "baseline_pr": 0.9305,
+              "rmt_rte_rec_pr": 0.9233
+            },
+            "blend": {
+              "baseline_roc": 0.9313,
+              "rmt_rte_rec_roc": 0.9253,
+              "delta_roc": -0.006,
+              "baseline_pr": 0.9451,
+              "rmt_rte_rec_pr": 0.9391
+            }
+          },
+          "scaffold": {
+            "dmpnn": {
+              "baseline_roc": 0.9084,
+              "rmt_rte_rec_roc": 0.902,
+              "delta_roc": -0.0064,
+              "baseline_pr": 0.9297,
+              "rmt_rte_rec_pr": 0.9208
+            },
+            "hgb": {
+              "baseline_roc": 0.8989,
+              "rmt_rte_rec_roc": 0.8951,
+              "delta_roc": -0.0038,
+              "baseline_pr": 0.9164,
+              "rmt_rte_rec_pr": 0.9129
+            },
+            "blend": {
+              "baseline_roc": 0.9149,
+              "rmt_rte_rec_roc": 0.9108,
+              "delta_roc": -0.0041,
+              "baseline_pr": 0.9333,
+              "rmt_rte_rec_pr": 0.9276
+            }
+          }
         }
       },
-      "+dock2": {
-        "blend": {
-          "roc_auc": 0.9373,
-          "pr_auc": 0.9524
-        },
-        "dmpnn": {
-          "roc_auc": 0.9342,
-          "pr_auc": 0.9506
-        },
-        "hgb": {
-          "roc_auc": 0.9349,
-          "pr_auc": 0.9484
+      "rmt_rte_integration": {
+        "base_features": "integration",
+        "by_split": {
+          "random": {
+            "dmpnn": {
+              "baseline_roc": 0.9247,
+              "rmt_rte_rec_roc": 0.9215,
+              "delta_roc": -0.0032,
+              "baseline_pr": 0.9388,
+              "rmt_rte_rec_pr": 0.9355
+            },
+            "hgb": {
+              "baseline_roc": 0.9158,
+              "rmt_rte_rec_roc": 0.9057,
+              "delta_roc": -0.0101,
+              "baseline_pr": 0.9304,
+              "rmt_rte_rec_pr": 0.9225
+            },
+            "blend": {
+              "baseline_roc": 0.93,
+              "rmt_rte_rec_roc": 0.9265,
+              "delta_roc": -0.0035,
+              "baseline_pr": 0.944,
+              "rmt_rte_rec_pr": 0.9412
+            }
+          },
+          "scaffold": {
+            "dmpnn": {
+              "baseline_roc": 0.9061,
+              "rmt_rte_rec_roc": 0.9038,
+              "delta_roc": -0.0023,
+              "baseline_pr": 0.9263,
+              "rmt_rte_rec_pr": 0.9251
+            },
+            "hgb": {
+              "baseline_roc": 0.8995,
+              "rmt_rte_rec_roc": 0.8913,
+              "delta_roc": -0.0082,
+              "baseline_pr": 0.919,
+              "rmt_rte_rec_pr": 0.9097
+            },
+            "blend": {
+              "baseline_roc": 0.9125,
+              "rmt_rte_rec_roc": 0.9102,
+              "delta_roc": -0.0023,
+              "baseline_pr": 0.9315,
+              "rmt_rte_rec_pr": 0.9284
+            }
+          }
         }
       },
-      "+raw_rte": {
-        "blend": {
-          "roc_auc": 0.9366,
-          "pr_auc": 0.9504
-        },
-        "dmpnn": {
-          "roc_auc": 0.9334,
-          "pr_auc": 0.9458
-        },
-        "hgb": {
-          "roc_auc": 0.9228,
-          "pr_auc": 0.9394
+      "rmt_rte_global_dock": {
+        "base_features": "dock_eng+rdkit",
+        "by_split": {
+          "random": {
+            "dmpnn": {
+              "baseline_roc": 0.9275,
+              "rmt_rte_rec_roc": 0.9231,
+              "delta_roc": -0.0044,
+              "baseline_pr": 0.9407,
+              "rmt_rte_rec_pr": 0.935
+            },
+            "hgb": {
+              "baseline_roc": 0.9158,
+              "rmt_rte_rec_roc": 0.9081,
+              "delta_roc": -0.0077,
+              "baseline_pr": 0.9304,
+              "rmt_rte_rec_pr": 0.9247
+            },
+            "blend": {
+              "baseline_roc": 0.9317,
+              "rmt_rte_rec_roc": 0.9277,
+              "delta_roc": -0.004,
+              "baseline_pr": 0.9451,
+              "rmt_rte_rec_pr": 0.9423
+            }
+          },
+          "scaffold": {
+            "dmpnn": {
+              "baseline_roc": 0.9061,
+              "rmt_rte_rec_roc": 0.8984,
+              "delta_roc": -0.0077,
+              "baseline_pr": 0.926,
+              "rmt_rte_rec_pr": 0.9184
+            },
+            "hgb": {
+              "baseline_roc": 0.8995,
+              "rmt_rte_rec_roc": 0.8916,
+              "delta_roc": -0.0079,
+              "baseline_pr": 0.919,
+              "rmt_rte_rec_pr": 0.9088
+            },
+            "blend": {
+              "baseline_roc": 0.9126,
+              "rmt_rte_rec_roc": 0.9088,
+              "delta_roc": -0.0038,
+              "baseline_pr": 0.9313,
+              "rmt_rte_rec_pr": 0.9264
+            }
+          }
         }
+      }
+    },
+    "residue_only_hgb_roc": {
+      "random": {
+        "rdkit": 0.9207,
+        "rte_raw": 0.7932,
+        "rte_rmt_sel": 0.7837,
+        "rte_rmt_rec": 0.76
       },
-      "+rmt_rte_sel": {
-        "blend": {
-          "roc_auc": 0.9345,
-          "pr_auc": 0.9483
-        },
-        "dmpnn": {
-          "roc_auc": 0.9293,
-          "pr_auc": 0.9426
-        },
-        "hgb": {
-          "roc_auc": 0.9241,
-          "pr_auc": 0.9403
-        }
-      },
-      "+rmt_rte_rec": {
-        "blend": {
-          "roc_auc": 0.9415,
-          "pr_auc": 0.9543
-        },
-        "dmpnn": {
-          "roc_auc": 0.9363,
-          "pr_auc": 0.9469
-        },
-        "hgb": {
-          "roc_auc": 0.9203,
-          "pr_auc": 0.9365
-        }
+      "scaffold": {
+        "rdkit": 0.907,
+        "rte_raw": 0.7716,
+        "rte_rmt_sel": 0.766,
+        "rte_rmt_rec": 0.7445
       }
     }
   },
-  "verdict": "For the open torch-free HGB analogue, adding docking / RMT-RTE does NOT improve confidence in either regime. (1) As features: the 217 RDKit-2D descriptors already saturate \u2014 Brier/ECE/AUC are flat-to-worse on random splits and on the scaffold split (structure AUC is the best rung in both). (2) As the p_QSAR x p_RMT-RTE veto: the precision@0.7 / FPR gains are a thresholding artifact \u2014 coverage collapses (0.45->0.18 random) while ranking degrades (AUC 0.918->0.901); at matched coverage the structure model alone is more precise (0.987 vs veto 0.952), and symmetric mean-fusion is no better. The scaffold split repeats this (structure matched-cov precision 0.772 vs veto 0.697). RMT-RTE is a weak (~0.80 AUC) standalone signal that only dilutes the strong structure model. Where RMT genuinely helps is the DMPNN/blend (see dmpnn_blend_reference), not this analogue: the paper's confidence gain lives in the graph net."
+  "verdict": "Adding docking / RMT-RTE does NOT improve model confidence, and this holds beyond the HGB analogue. (1) As features on HGB: the 217 RDKit-2D descriptors saturate \u2014 Brier/ECE/AUC are flat-to-worse on random and scaffold (structure is the best rung in both), and +rmt_rte_rec worsens Brier (p=0.037). (2) As the p_QSAR x p_RMT-RTE veto: the precision@0.7 / FPR gains are a thresholding artifact \u2014 coverage collapses (0.45->0.18 random), ranking degrades (AUC 0.918->0.901), and at matched coverage structure alone is more precise (0.987 vs 0.952); mean-fusion is no better and the scaffold split repeats it. (3) On the DMPNN and the DMPNN+HGB STACK: the team's paired k-fold CV (dmpnn_stack_rmt_kfold) shows rmt_rte_rec LOWERS ROC-AUC & PR-AUC for all three models on both splits (blend 0.931->0.925 random, 0.915->0.911 scaffold) \u2014 the earlier single split_00 blend number (0.9343->0.9415) was a one-split artifact. RMT-reconstructed RTE is even weaker than raw RTE (0.76 vs 0.79 HGB ROC), so it only dilutes the structure model. Net: RMT-RTE improves neither confidence nor discrimination on any model here."
 }

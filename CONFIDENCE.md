@@ -77,28 +77,42 @@ by ROC-AUC/PR-AUC — **the structure model alone is more precise and ranks bett
 precision/recall trade by simply raising the structure model's own threshold. Symmetric mean-fusion
 `½(p_QSAR + p_RMT-RTE)` is no better (random AUC 0.900).
 
-## Reconciliation — where RMT *does* help: the graph-net stack
+## The DMPNN and the DMPNN+HGB stack — RMT-RTE doesn't help them either
 
-RMT-RTE is not useless — it just doesn't help the **HGB** analogue. The authors' bundled `split_00`
-ablation shows RMT-RTE-rec genuinely lifting the **DMPNN / blend**:
+The obvious rebuttal is "you used HGB; the paper's model is the DMPNN stack, where RMT is complementary."
+We checked directly. The team's own **paired k-fold CV** (`Activity/dmpnn/eval_rmt_rte.py` — same
+train/val/test partition, same RMT fit, same DMPNN seeds per fold; only the extra feature block differs;
+bundled as `server/data/reference/dmpnn_stack_rmt_cv.json`) adds `rmt_rte_rec` to the `dock_eng+rdkit`
+baseline and measures DMPNN, HGB and the blend. Adding RMT-RTE **lowers** ROC-AUC and PR-AUC everywhere:
 
-| feature set | blend ROC-AUC | blend PR-AUC | DMPNN ROC-AUC | HGB ROC-AUC |
+| model | random baseline → +rmt | scaffold baseline → +rmt |
+|---|---|---|
+| DMPNN | 0.9260 → **0.9175** | 0.9084 → **0.9020** |
+| HGB | 0.9159 → **0.9064** | 0.8989 → **0.8951** |
+| **blend** | 0.9313 → **0.9253** | 0.9149 → **0.9108** |
+
+Same direction for PR-AUC, and the same across all three base-feature configs (`rdkit_only`,
+`integration`, `global_dock`). A residue-feature breakdown shows why — RMT-**reconstructed** RTE is the
+*weakest* of the RTE variants, below even raw RTE:
+
+| features (HGB, random) | RDKit-2D | raw RTE | RMT-selected RTE | RMT-reconstructed RTE |
 |---|---|---|---|---|
-| `structure` (rdkit2d) | 0.9343 | 0.9485 | 0.9343 | 0.9300 |
-| `+rmt_rte_rec` | **0.9415** | **0.9543** | **0.9363** | 0.9203 |
+| ROC-AUC | **0.9207** | 0.7932 | 0.7837 | 0.7600 |
 
-The graph net's learned structure representation is complementary to the RMT-denoised docking
-subspace; a gradient-boosted tree on tabular RDKit-2D descriptors is not. **The paper's RMT confidence
-benefit lives in the DMPNN stack, and is not reproducible with the torch-free analogue.**
+RMT-RTE is a weak (~0.80) and partly redundant signal; adding it dilutes rather than sharpens, on the
+graph net exactly as on the tree. **My earlier claim that RMT lifts the blend (0.9343 → 0.9415) was an
+artifact of the single `split_00` ablation; the honest k-fold CV refutes it for every model.**
 
 ## Verdict
 
-For the open, torch-free HGB analogue, **adding docking / RMT-RTE does not improve model confidence** —
-not as features (calibration flat-to-worse in both regimes), and not via the veto (a precision/operating-
-point trade, not a calibration gain; dominated by structure at matched coverage). To rigorously
-demonstrate the RMT-improves-confidence claim, run the ladder on the **DMPNN/blend** with per-split OOF
-probabilities (the vendored Chemprop pipeline, `server/vendor/train_dmpnn_rmt_rte.py`) and score Brier /
-ECE / matched-coverage precision there — that is the model where RMT already lifts discrimination.
+**Adding docking / RMT-RTE does not improve model confidence — on any model here.** On the HGB analogue
+it is flat-to-worse as features and a thresholding trade as a veto (dominated by structure at matched
+coverage). On the DMPNN and the DMPNN+HGB stack, the team's paired k-fold CV shows it *lowers*
+discrimination on both random and scaffold splits. The one number that suggested otherwise was a
+single-split artifact. What remains unmeasured is calibration (Brier/ECE) *on the stack specifically* —
+`eval_rmt_rte.py` saved only summary AUC/PR-AUC, not per-fold OOF probabilities; re-running it with
+probability persistence would settle it, but since RMT-RTE uniformly *lowers* the stack's discrimination,
+a calibration reversal is unlikely.
 
 ## Reproduce
 
