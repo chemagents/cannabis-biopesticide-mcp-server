@@ -182,15 +182,19 @@ def tox_ecotox_reference() -> dict:
     om = reference.TOX_OPEN_MODELS
     return {
         "answer": {
-            "open_model_reproduction": om["endpoints"],
+            "open_model_quality": om["endpoints"],
             "open_beats_benchmark": om["beats_benchmark"],
-            "model_quality_table_s1_syntelly": {k: {"metric": v[0], "value": v[1]}
+            "open_safety_comparison_35": reference.TOX_OPEN_FINDINGS,   # metabolites vs pesticides, full sets
+            "syntelly_published": {"table_s1": {k: {"metric": v[0], "value": v[1]}
                                                 for k, v in reference.TOX_METRICS.items()},
-            "headline": reference.TOX_FINDINGS,
-            "finding": "Open reproduction (TOXRIC+ECOTOX, ensemble) beats the Syntelly/TOXRIC benchmark "
-                       "on Ames (0.92 vs 0.88), Daphnia (RMSE 1.03 vs 1.11) and fathead minnow "
-                       "(0.79 vs 0.86) under the paper's random-CV protocol; reproductive is a data "
-                       "limit (n=156). C. sativa metabolites remain safer than synthetic pesticides.",
+                                   "headline": reference.TOX_FINDINGS},
+            "finding": "Open reproduction (TOXRIC+ECOTOX ensemble) beats the Syntelly/TOXRIC benchmark "
+                       "on Ames (0.92 vs 0.88), Daphnia (1.03 vs 1.11) and fathead (0.79 vs 0.86) under "
+                       "the paper's random-CV protocol. Running the open models on the full sets "
+                       "REPRODUCES the paper's safety conclusion: metabolites are safer on acute LD50 "
+                       "(median 1617 vs 911 mg/kg) and hepatotoxicity/DILI (34% vs 64% toxic), "
+                       "Ames/carcinogenicity ~tied; magnitudes compressed vs Syntelly. Reproductive is a "
+                       "data limit; the top-10 candidates are pesticide-like (see caveats).",
         },
         "metadata": {"reference": PAPER, "recipe": om["recipe"], "protocol": om["protocol"],
                      "data_sources": om["data_sources"],

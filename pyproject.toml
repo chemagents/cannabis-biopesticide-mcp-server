@@ -49,6 +49,9 @@ packages = ["server"]
 "server/data/tox/toxric_fathead.csv" = "server/data/tox/toxric_fathead.csv"
 "server/data/tox/daphnia_aug.csv" = "server/data/tox/daphnia_aug.csv"
 "server/data/tox/fathead_aug.csv" = "server/data/tox/fathead_aug.csv"
+"server/data/tox/table3_metabolites_open.csv" = "server/data/tox/table3_metabolites_open.csv"
+"server/data/tox/table4_pesticides_open.csv" = "server/data/tox/table4_pesticides_open.csv"
+"server/data/tox/section35_open.json" = "server/data/tox/section35_open.json"
 
 [build-system]
 requires = ["hatchling"]
