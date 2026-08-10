@@ -52,6 +52,21 @@ upload endpoint.
 > prefixed names above via `@mcp.tool(name=...)`. The Python functions in `server/canpest_server.py`
 > keep their original names — only the MCP-facing name changed.
 
+## Multi-question article reproduction
+
+The recommended workflow is four natural scientific questions, not one "confirm/reproduce the
+paper" request:
+
+1. dataset scope + measured chemical-space overlap;
+2. pest-target docking + RMT denoising + physical-consistency veto;
+3. QSAR quality + candidate selection within the applicability domain; and
+4. the safety comparison that is actually supported by the published evidence.
+
+Tools in each question return machine-readable `metadata.next_tools`. They also tell the
+orchestrator to return every non-null figure artifact with its kind and SHA-256. Exact prompts and
+the evidence/coverage contract are in
+[`REPRODUCTION_QUESTIONS.md`](./REPRODUCTION_QUESTIONS.md).
+
 ## Reproduction fidelity
 
 Using the authors' exact 217-descriptor matrix (`fp_rdkit2d.npy`) and a faithful port of their

@@ -27,6 +27,41 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("CannabisBiopesticide")
 PAPER = reference.PAPER
 
+ARTIFACT_OUTPUT_POLICY = (
+    "Return every non-null figure artifact from this question to the user together with its "
+    "URL or path, kind, and SHA-256; do not replace the scientific answer with an internal task "
+    "log."
+)
+QUESTIONS = {
+    1: "What is being screened, and does the Cannabis metabolome occupy pesticide-like chemical space?",
+    2: ("Do Cannabis metabolites engage pest targets, does RMT isolate useful docking signal, "
+        "and does a physical-consistency veto reduce false positives?"),
+    3: "How reliable is the pesticidal-activity model, and which metabolites are credible candidates?",
+    4: "What safety comparison is actually supported for Cannabis metabolites versus synthetic pesticides?",
+}
+QUESTION_TOOLS = {
+    1: ["canpest_dataset_overview", "chemical_space"],
+    2: ["docking_analysis", "rmt_feature_selection", "docking_veto"],
+    3: ["qsar_model_quality", "model_stack", "predict_biopesticides"],
+    4: ["tox_ecotox_reference"],
+}
+
+
+def _chain(question: int, self_name: str) -> dict:
+    """Machine-readable question and sibling-tool routing for the orchestrator."""
+    tools = QUESTION_TOOLS[question]
+    return {
+        "question": QUESTIONS[question],
+        "next_tools": [tool for tool in tools if tool != self_name],
+        "next_tools_reason": (
+            "These sibling tools answer complementary parts of the same scientific question; "
+            "use all of them before concluding."
+            if len(tools) > 1
+            else "This tool is the complete evidence source for this question."
+        ),
+        "artifact_output_policy": ARTIFACT_OUTPUT_POLICY,
+    }
+
 
 @mcp.tool(name="canpest_dataset_overview")
 def dataset_overview() -> dict:
@@ -57,6 +92,7 @@ def dataset_overview() -> dict:
                 f"PESTICIDAL ACTIVITY, not mammalian toxicity."),
         },
         "metadata": {"paper": reference.DATASETS, "reference": PAPER,
+                     **_chain(1, "canpest_dataset_overview"),
                      "note": "Docking (Vina-GPU) precomputed by the authors; scores are bundled."},
     }
 
@@ -98,7 +134,8 @@ def docking_analysis() -> dict:
     return {
         "answer": {**res, "n_expected_trend": len(expected), "n_opposite_trend": len(opposite),
                    "finding": head + tail},
-        "metadata": {"figure": fig, "paper": reference.DOCKING, "reference": PAPER},
+        "metadata": {"figure": fig, "paper": reference.DOCKING, "reference": PAPER,
+                     **_chain(2, "docking_analysis")},
     }
 
 
@@ -126,6 +163,7 @@ def rmt_feature_selection(scaffold_split: bool = False) -> dict:
                           if ref.get("n_signal") is not None and ref["n_signal"] != n_sig
                           else "All three quantities agree with the paper."))},
         "metadata": {"paper": ref, "reference": PAPER,
+                     **_chain(2, "rmt_feature_selection"),
                      "matches": {"lambda_plus": abs(res["lambda_plus"] - ref["lambda_plus"]) < 0.01,
                                  "m_opt_close": abs(res["m_opt"] - ref["m_opt_random"]) <= 30,
                                  "n_signal": (ref.get("n_signal") == res["n_signal"]
@@ -155,6 +193,7 @@ def qsar_model_quality(scaffold_split: bool = False) -> dict:
                        f"residue-level docking model (CB-SD) reaches {cb['all6_rte']['roc_auc']:.3f}.",
         },
         "metadata": {"paper": reference.QSAR, "reference": PAPER,
+                     **_chain(3, "qsar_model_quality"),
                      "note": "This is the HGB component of the stack; see model_stack for the full "
                              "DMPNN+HGB ensemble. Exact DMPNN via the vendored torch pipeline "
                              "(server/vendor)."},
@@ -163,8 +202,8 @@ def qsar_model_quality(scaffold_split: bool = False) -> dict:
 
 @mcp.tool()
 def model_stack() -> dict:
-    """Architecture and published CV metrics of the paper's biopesticide QSAR stack (weighted
-    DMPNN + HGB soft-voting ensemble, Section 3.3/3.4).
+    """How reliable is the pesticidal-activity model? Architecture and published CV metrics of
+    the paper's weighted DMPNN + HGB soft-voting QSAR stack (Section 3.3/3.4).
 
     LOOKUP of the authors' bundled 5-fold OOF-CV numbers — this tool recomputes nothing. For the
     quality figures this server actually measures, call `qsar_model_quality`.
@@ -184,6 +223,7 @@ def model_stack() -> dict:
                          f"not measured by this server — the number this server actually computes "
                          f"is `qsar_model_quality.best_roc_auc`.")},
         "metadata": {"paper": {"dmpnn_sd_roc": reference.QSAR["dmpnn_sd_roc"]}, "reference": PAPER,
+                     **_chain(3, "model_stack"),
                      "provenance": "precomputed reference values, not recomputed here",
                      "bundled_cv": reference.load_bundled_reference().get("model_stack_cv", {})},
     }
@@ -204,7 +244,8 @@ def docking_veto() -> dict:
                               f"threshold 0.5, trading recall ({v['recall_before']:.2f}→"
                               f"{v['recall_after_veto']:.2f}) — a physical-consistency filter, not an average."},
         "metadata": {"paper": {"fpr_before": reference.QSAR["fpr_before"],
-                               "fpr_after_veto": reference.QSAR["fpr_after_veto"]}, "reference": PAPER},
+                               "fpr_after_veto": reference.QSAR["fpr_after_veto"]},
+                     "reference": PAPER, **_chain(2, "docking_veto")},
     }
 
 
@@ -232,6 +273,7 @@ def predict_biopesticides() -> dict:
                        f"against the paper's {round(paper_n / paper_frac)}. Compare the fraction, "
                        f"not the count.")},
         "metadata": {"paper": reference.CANDIDATES, "reference": PAPER,
+                     **_chain(3, "predict_biopesticides"),
                      "denominator_note": (
                          f"paper denominator ~{round(paper_n / paper_frac)} metabolites vs "
                          f"{n_meta} here")},
@@ -280,7 +322,7 @@ def chemical_space() -> dict:
         "answer": {**(overlap or {}), "finding": finding},
         "metadata": {"figure": fig, "method": "differential scaffold fingerprint + t-SNE; overlap "
                                               "measured as ECFP4 Tanimoto nearest-neighbour class",
-                     "reference": PAPER},
+                     "reference": PAPER, **_chain(1, "chemical_space")},
     }
 
 
@@ -326,7 +368,7 @@ def tox_ecotox_reference() -> dict:
                   "conclusion from this tool. For live open-model toxicity prediction use "
                   "`predict_general_toxicity` / `predict_ld50` on the `heracleum-tox` server."),
         },
-        "metadata": {"reference": PAPER,
+        "metadata": {"reference": PAPER, **_chain(4, "tox_ecotox_reference"),
                      "provenance": "published Syntelly values, not recomputed here",
                      "coverage_caveat": "model_quality_table_s1 holds MODEL METRICS (RMSE/ROC-AUC), "
                                         "not toxicity outcomes; the aquatic endpoints appear only "

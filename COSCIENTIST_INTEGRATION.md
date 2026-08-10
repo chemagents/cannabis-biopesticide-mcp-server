@@ -47,10 +47,10 @@ The `ToolRetrieverAgent` then surfaces the 11 tools for biopesticide / insectici
 plant-metabolite queries, and `ExperimentAgent` (FEDOT.MAS) calls them by URL. Shared Docker
 network → register `http://cannabis-biopesticide-mcp-server:7331/mcp`.
 
-Example CoScientist prompt:
-
-> "Use the cannabis-biopesticide tools: analyse the docking of Cannabis sativa metabolites to
-> the pest targets and state how many are candidate biopesticides."
+Use the four-question scenario in
+[`REPRODUCTION_QUESTIONS.md`](./REPRODUCTION_QUESTIONS.md), rather than one broad reproduction
+prompt. Each question explicitly asks CoScientist to return the figure artifacts (URL/path, kind
+and SHA-256) alongside a direct scientific answer.
 
 ---
 
