@@ -12,7 +12,7 @@ from .config import get_settings  # noqa: E402
 from .dataset import Dataset  # noqa: E402
 
 
-def plot_docking(per_protein: list[dict]) -> str:
+def plot_docking(per_protein: list[dict]) -> dict:
     fig, ax = plt.subplots(figsize=(8, 5))
     names = [r["protein"] for r in per_protein]
     deltas = [r["delta"] for r in per_protein]
@@ -25,7 +25,7 @@ def plot_docking(per_protein: list[dict]) -> str:
     return artifacts.save_figure(fig, "fig2_docking")
 
 
-def plot_chemical_space(ds: Dataset, sample: int = 1500) -> str:
+def plot_chemical_space(ds: Dataset, sample: int = 1500) -> dict:
     from sklearn.manifold import TSNE
 
     s = get_settings()

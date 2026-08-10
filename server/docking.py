@@ -13,6 +13,47 @@ from scipy.stats import false_discovery_control, mannwhitneyu
 from .dataset import DOCK_COLS, PROTEINS, Dataset
 
 
+def metabolite_pesticide_overlap(ds: Dataset, n_bits: int = 2048,
+                                 max_metabolites: int = 800) -> dict:
+    """Measure how far the C. sativa metabolites sit from the labelled pesticide space.
+
+    ``chemical_space`` used to *assert* that the two spaces overlap, with no number behind it and
+    the assertion still returned when the t-SNE figure failed. This computes the claim instead:
+    for each metabolite, the ECFP4 Tanimoto nearest neighbour among the labelled compounds and
+    whether that neighbour is an active pesticide.
+    """
+    from rdkit import DataStructs
+    from rdkit.Chem import rdMolDescriptors
+
+    rng = np.random.default_rng(0)
+    meta_idx = np.flatnonzero(ds.metabolite_mask)
+    if meta_idx.size > max_metabolites:
+        meta_idx = np.sort(rng.choice(meta_idx, size=max_metabolites, replace=False))
+    lab_idx = np.flatnonzero(ds.labelled_mask)
+    if lab_idx.size == 0 or meta_idx.size == 0:
+        return {}
+
+    def fp(i):
+        return rdMolDescriptors.GetMorganFingerprintAsBitVect(ds.mols[i], 2, nBits=n_bits)
+
+    lab_fps = [fp(i) for i in lab_idx]
+    lab_active = ds.active_mask[lab_idx]
+    nn_sim, nn_is_active = [], []
+    for i in meta_idx:
+        sims = DataStructs.BulkTanimotoSimilarity(fp(i), lab_fps)
+        j = int(np.argmax(sims))
+        nn_sim.append(float(sims[j]))
+        nn_is_active.append(bool(lab_active[j]))
+    nn_sim_a = np.asarray(nn_sim)
+    return {
+        "n_metabolites": int(meta_idx.size),
+        "n_labelled_reference": int(lab_idx.size),
+        "frac_nn_active": round(float(np.mean(nn_is_active)), 3),
+        "median_nn_similarity": round(float(np.median(nn_sim_a)), 3),
+        "frac_nn_similarity_above_0_4": round(float(np.mean(nn_sim_a > 0.4)), 3),
+    }
+
+
 def active_vs_inactive(ds: Dataset) -> dict:
     active = ds.dock[ds.active_mask]
     inactive = ds.dock[ds.inactive_mask]
