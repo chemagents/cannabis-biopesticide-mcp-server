@@ -4,8 +4,16 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: cannabis-biopesticide-mcp-server
+    env_file:
+      - path: .env
+        required: false
     environment:
       PYTHONUNBUFFERED: "1"
     ports:
       - "7337:7331"   # host 7337 -> container 7331 (matches the CoScientist stack)
+    volumes:
+      - cannabis_biopesticide_artifacts:/app/artifacts
     restart: unless-stopped
+
+volumes:
+  cannabis_biopesticide_artifacts:

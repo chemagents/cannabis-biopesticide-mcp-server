@@ -1,0 +1,3 @@
+# The bundled training/reference tables are required by a clean clone.  Override
+# the repository-wide `*.csv` rule for this package only.
+!*.csv

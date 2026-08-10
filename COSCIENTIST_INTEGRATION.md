@@ -43,7 +43,7 @@ docker compose up -d --build cannabis-biopesticide-mcp-server
 python scripts/rag_tools/cli.py load mcp-servers/cannabis-biopesticide-mcp-server/rag_registration.json
 ```
 
-The `ToolRetrieverAgent` then surfaces the 9 tools for biopesticide / insecticide / docking /
+The `ToolRetrieverAgent` then surfaces the 11 tools for biopesticide / insecticide / docking /
 plant-metabolite queries, and `ExperimentAgent` (FEDOT.MAS) calls them by URL. Shared Docker
 network → register `http://cannabis-biopesticide-mcp-server:7331/mcp`.
 
@@ -59,20 +59,19 @@ Example CoScientist prompt:
 Run `python reproduce_paper.py` or `uv run pytest tests -v`. Observed:
 
 ```text
-reproduce_all: 7/7 headline results reproduced within tolerance
-  [PASS] docking_5_negative_OR28_positive : 5 neg / anomaly=OR28
-  [PASS] metabolite_docking_median_range  : [-7.3, -5.3]   (paper -7.2..-5.2)
-  [PASS] rmt_lambda_plus                  : 1.9381         (paper 1.938, exact)
-  [PASS] rmt_m_opt                        : ~134-153       (paper 161)
-  [PASS] qsar_roc_auc_high                : ~0.93          (paper DMPNN-SD 0.928)
-  [PASS] cb_sd_docking_in_range           : 0.756          (paper 0.68-0.80)
-  [PASS] biopesticide_candidates_fraction : ~0.35          (paper 0.41)
-reproduce_claims: 5/5 ;  pytest: 6 passed ;  HTTP: 9 tools exposed
+canpest_reproduce_all: 8/10 checks match their stated tolerances
+  [PASS] docking direction, docking median, lambda+, m_opt
+  [FAIL] RMT signal eigenvalues: 16 vs paper 19
+  [PASS] recomputed QSAR ROC-AUC, CB-SD, veto effect, candidate fraction
+  [FAIL] pre-veto baseline FPR: 15.7% vs paper 12.2%
+canpest_reproduce_claims: 5/6 claims reproduced
+  [NOT REPRODUCED] C5 safety comparison: published Syntelly lookup, no live model here
+HTTP: 11 tools exposed (the three cross-server collisions use `canpest_` prefixes)
 ```
 
 The upstream molecular docking (AutoDock Vina-GPU) is bundled as scores + 390 residue-term
 energies, so the server has **no GPU/torch dependency** — it recomputes the docking statistics,
 the RMT (Marchenko–Pastur) filter, the QSAR ablation, the applicability domain and the candidate
 list deterministically. See [`README.md`](./README.md) for the open-analogue mapping and the
-documented divergences (HGB vs DMPNN-SD ≈0.92 vs 0.93; Tanimoto-kNN AD stricter than the paper's).
-```
+documented divergences. The server reports failures explicitly instead of inflating the
+reproduction count; in particular, the §3.5 Syntelly safety claim remains a published lookup.

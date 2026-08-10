@@ -295,7 +295,14 @@ def model_stack_quality() -> dict:
     s = reference.QSAR_STACK
     return {"blend_w_dmpnn": s["blend_w_dmpnn"], "threshold": s["threshold"],
             "components": {"dmpnn": s["dmpnn"], "hgb": s["hgb"]}, "blend": s["blend"],
-            "ranking": s["ranking"], "per_featureset_blend_roc": s["per_featureset_blend_roc"]}
+            "ranking": s["ranking"], "per_featureset_blend_roc": s["per_featureset_blend_roc"],
+            # These are the AUTHORS' bundled OOF-CV numbers, echoed verbatim. Nothing here is
+            # recomputed by this server, and every consumer must be able to see that from the
+            # payload alone rather than from a docstring.
+            "provenance": "PRECOMPUTED — the authors' bundled 5-fold OOF-CV metrics, echoed "
+                          "verbatim by this server. NOT recomputed here; the recomputed QSAR "
+                          "number is `qsar_model_quality.best_roc_auc`.",
+            "recomputed_here": False}
 
 
 def predict_biopesticides() -> dict:
@@ -354,14 +361,14 @@ def predict_biopesticides() -> dict:
     if use_stack:
         # The stack "Probability" already encodes model confidence -> paper's number is the raw >cut count.
         headline_count, headline_frac = raw, raw / n
-        headline_basis = "prob>0.7 (DMPNN+HGB stack, paper definition)"
+        headline_basis = f"prob>{cut} (DMPNN+HGB stack, paper definition)"
         note = (f"DMPNN+HGB stack (blend w={settings.blend_w_dmpnn}): {raw} of {n} metabolites at "
                 f"prob>{cut} = {raw / n:.2%} (paper: 1010 / 40.97%). {candidates} also fall inside the "
                 "Tanimoto applicability domain.")
     else:
         # HGB is calibrated differently; its closest single value to the paper is the AD-filtered count.
         headline_count, headline_frac = candidates, candidates / n
-        headline_basis = "prob>0.7 within Tanimoto AD (HGB analogue)"
+        headline_basis = f"prob>{cut} within Tanimoto AD (HGB analogue)"
         note = (f"HGB torch-free analogue (no bundled DMPNN found): prob>{cut} flags "
                 f"{raw / n:.0%} without AD and {candidates / n:.0%} with a Tanimoto AD, bracketing "
                 "the paper's 41%. Drop server/data/dmpnn_pred.csv (ligand_id,prob) for the exact "
