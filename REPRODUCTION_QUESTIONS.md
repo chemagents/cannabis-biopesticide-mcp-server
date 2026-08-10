@@ -2,7 +2,10 @@
 
 The server is meant to answer scientific questions, not to receive one instruction to
 "confirm the paper." Use the four-question sequence below. Each question maps to a small set of
-tools whose results are chained through `metadata.next_tools`.
+tools whose results are chained in the canonical forward-only order below. A nonterminal tool's
+`metadata.next_tools` contains only its immediate successor. The last tool in a question has no
+sibling successor and instead returns `metadata.next_question`; the last tool in Question 4
+returns `next_question: null` and `workflow_status: reproduction_complete`.
 
 Append this explicit output request to **every** question:
 
@@ -18,7 +21,7 @@ Ask:
 > "What compounds are used to train and screen the Cannabis biopesticide model, and does the
 > Cannabis metabolome occupy the same chemical space as known pesticides?"
 
-Use: `canpest_dataset_overview` + `chemical_space`.
+Canonical order: `canpest_dataset_overview` → `chemical_space` → Question 2.
 
 Report the labelled active/inactive set, the unlabelled metabolite set, the six pest targets, the
 measured nearest-neighbour Tanimoto overlap, and the chemical-space figure artifact. Do not infer
@@ -32,7 +35,7 @@ Ask:
 > random-matrix denoising isolate useful signal rather than noise, and does a physical-consistency
 > docking veto reduce false positives?"
 
-Use: `docking_analysis` + `rmt_feature_selection` + `docking_veto`.
+Canonical order: `docking_analysis` → `rmt_feature_selection` → `docking_veto` → Question 3.
 
 Report the five expected docking trends and the OR28 exception, the recomputed Marchenko–Pastur
 edge / signal count / selected-feature count, the false-positive-rate effect of the docking veto,
@@ -45,7 +48,7 @@ Ask:
 > "How reliable is the pesticidal-activity QSAR model, and which Cannabis metabolites are credible
 > biopesticide candidates within its applicability domain?"
 
-Use: `qsar_model_quality` + `model_stack` + `predict_biopesticides`.
+Canonical order: `qsar_model_quality` → `model_stack` → `predict_biopesticides` → Question 4.
 
 Separate metrics recomputed by this server from the authors' bundled OOF-CV lookup. Compare the
 candidate **fraction**, not the absolute count, because the screening denominators differ. Return
@@ -58,7 +61,7 @@ Ask:
 > "What can we defensibly conclude about the mammalian and aquatic safety of Cannabis metabolites
 > versus synthetic pesticides from the evidence bundled with this article reproduction?"
 
-Use: `tox_ecotox_reference`.
+Canonical order: `tox_ecotox_reference` → workflow complete.
 
 This is a published Syntelly lookup, not a live toxicity calculation. Report only endpoints that
 carry an actual metabolite-versus-pesticide comparison. Aquatic entries in Table S1 are model

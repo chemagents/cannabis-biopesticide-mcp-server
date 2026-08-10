@@ -62,10 +62,11 @@ paper" request:
 3. QSAR quality + candidate selection within the applicability domain; and
 4. the safety comparison that is actually supported by the published evidence.
 
-Tools in each question return machine-readable `metadata.next_tools`. They also tell the
-orchestrator to return every non-null figure artifact with its kind and SHA-256. Exact prompts and
-the evidence/coverage contract are in
-[`REPRODUCTION_QUESTIONS.md`](./REPRODUCTION_QUESTIONS.md).
+Tools in each question form a deterministic forward-only chain. `metadata.next_tools` contains
+only the immediate sibling successor; each terminal tool returns `metadata.next_question`, and
+Question 4 terminates explicitly. They also tell the orchestrator to return every non-null figure
+artifact with its URL or path, kind and SHA-256. Exact prompts and the evidence/coverage contract
+are in [`REPRODUCTION_QUESTIONS.md`](./REPRODUCTION_QUESTIONS.md).
 
 ## Reproduction fidelity
 

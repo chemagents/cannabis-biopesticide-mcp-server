@@ -120,3 +120,79 @@ def test_tool_does_not_swallow_artifact_storage_error(monkeypatch):
     monkeypatch.setattr(canpest_server.plotting, "plot_docking", fail_storage)
     with pytest.raises(artifacts.ArtifactStorageError, match="S3 unavailable"):
         canpest_server.docking_analysis()
+
+
+def test_chemical_space_does_not_swallow_artifact_storage_error(monkeypatch):
+    monkeypatch.setattr(canpest_server, "load_dataset", lambda: object())
+
+    def fail_storage(*_args, **_kwargs):
+        raise artifacts.ArtifactStorageError("S3 unavailable")
+
+    monkeypatch.setattr(canpest_server.plotting, "plot_chemical_space", fail_storage)
+    with pytest.raises(artifacts.ArtifactStorageError, match="S3 unavailable"):
+        canpest_server.chemical_space()
+
+
+def test_artifact_fallback_warning_is_promoted_to_metadata(monkeypatch):
+    monkeypatch.setattr(canpest_server, "load_dataset", lambda: object())
+    monkeypatch.setattr(
+        canpest_server.docking,
+        "active_vs_inactive",
+        lambda _ds: {"per_protein": []},
+    )
+    artifact = {
+        "artifact": "/tmp/figure.png",
+        "kind": "local",
+        "sha256": "0" * 64,
+        "warning": "S3 upload failed; explicit local fallback used",
+    }
+    monkeypatch.setattr(canpest_server.plotting, "plot_docking", lambda _rows: artifact)
+    result = canpest_server.docking_analysis()
+    assert result["metadata"]["figure"] == artifact
+    assert result["metadata"]["warnings"] == [artifact["warning"]]
+
+
+def test_generic_docking_plot_failure_is_disclosed_without_losing_answer(monkeypatch):
+    monkeypatch.setattr(canpest_server, "load_dataset", lambda: object())
+    monkeypatch.setattr(
+        canpest_server.docking,
+        "active_vs_inactive",
+        lambda _ds: {"per_protein": [], "measured": 1},
+    )
+
+    def fail_plot(*_args, **_kwargs):
+        raise RuntimeError("renderer unavailable")
+
+    monkeypatch.setattr(canpest_server.plotting, "plot_docking", fail_plot)
+    result = canpest_server.docking_analysis()
+    assert result["answer"]["measured"] == 1
+    assert result["answer"]["finding"]
+    assert result["metadata"]["figure"] is None
+    assert result["metadata"]["warnings"] == [
+        "Docking figure could not be produced (RuntimeError): renderer unavailable"
+    ]
+
+
+def test_generic_chemical_space_plot_failure_is_disclosed(monkeypatch):
+    monkeypatch.setattr(canpest_server, "load_dataset", lambda: object())
+    monkeypatch.setattr(
+        canpest_server.docking,
+        "metabolite_pesticide_overlap",
+        lambda _ds: {
+            "frac_nn_active": 0.5,
+            "n_metabolites": 2,
+            "median_nn_similarity": 0.4,
+            "frac_nn_similarity_above_0_4": 0.5,
+        },
+    )
+
+    def fail_plot(*_args, **_kwargs):
+        raise RuntimeError("renderer unavailable")
+
+    monkeypatch.setattr(canpest_server.plotting, "plot_chemical_space", fail_plot)
+    result = canpest_server.chemical_space()
+    assert result["answer"]["finding"]
+    assert result["metadata"]["figure"] is None
+    assert result["metadata"]["warnings"] == [
+        "Chemical-space figure could not be produced (RuntimeError): renderer unavailable"
+    ]

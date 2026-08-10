@@ -28,9 +28,10 @@ mcp = FastMCP("CannabisBiopesticide")
 PAPER = reference.PAPER
 
 ARTIFACT_OUTPUT_POLICY = (
-    "Return every non-null figure artifact from this question to the user together with its "
-    "URL or path, kind, and SHA-256; do not replace the scientific answer with an internal task "
-    "log."
+    "Answer the scientific question directly. Return every non-null figure artifact from this "
+    "question to the user together with its URL or path, kind, and SHA-256. Do not replace the "
+    "scientific answer with an internal task log or a bare confirmation. Disclose every warning "
+    "from metadata, including artifact-storage fallback warnings."
 )
 QUESTIONS = {
     1: "What is being screened, and does the Cannabis metabolome occupy pesticide-like chemical space?",
@@ -45,22 +46,55 @@ QUESTION_TOOLS = {
     3: ["qsar_model_quality", "model_stack", "predict_biopesticides"],
     4: ["tox_ecotox_reference"],
 }
+QUESTION_ORDER = tuple(QUESTIONS)
 
 
 def _chain(question: int, self_name: str) -> dict:
-    """Machine-readable question and sibling-tool routing for the orchestrator."""
+    """Return the deterministic, forward-only route after one question tool."""
     tools = QUESTION_TOOLS[question]
-    return {
+    if self_name not in tools:
+        raise ValueError(f"{self_name!r} is not registered for question {question}")
+
+    position = tools.index(self_name)
+    next_sibling = tools[position + 1:position + 2]
+    route = {
         "question": QUESTIONS[question],
-        "next_tools": [tool for tool in tools if tool != self_name],
-        "next_tools_reason": (
-            "These sibling tools answer complementary parts of the same scientific question; "
-            "use all of them before concluding."
-            if len(tools) > 1
-            else "This tool is the complete evidence source for this question."
-        ),
+        "question_number": question,
+        "next_tools": next_sibling,
         "artifact_output_policy": ARTIFACT_OUTPUT_POLICY,
     }
+    if next_sibling:
+        route.update({
+            "workflow_status": "within_question",
+            "next_tools_reason": "Call the next evidence tool in this question's canonical order.",
+        })
+        return route
+
+    next_position = QUESTION_ORDER.index(question) + 1
+    route["next_tools_reason"] = "This question's evidence sequence is complete."
+    if next_position < len(QUESTION_ORDER):
+        next_number = QUESTION_ORDER[next_position]
+        route.update({
+            "workflow_status": "question_complete",
+            "next_question": {
+                "question_number": next_number,
+                "question": QUESTIONS[next_number],
+                "entry_tool": QUESTION_TOOLS[next_number][0],
+            },
+        })
+    else:
+        route.update({
+            "workflow_status": "reproduction_complete",
+            "next_question": None,
+        })
+    return route
+
+
+def _artifact_warnings(artifact: dict | None) -> list[str]:
+    """Promote an artifact fallback warning into the common metadata warning channel."""
+    if artifact and artifact.get("warning"):
+        return [str(artifact["warning"])]
+    return []
 
 
 @mcp.tool(name="canpest_dataset_overview")
@@ -109,12 +143,16 @@ def docking_analysis() -> dict:
     ds = load_dataset()
     res = docking.active_vs_inactive(ds)
     fig = None
+    warnings = []
     try:
         fig = plotting.plot_docking(res["per_protein"])
+        warnings.extend(_artifact_warnings(fig))
     except artifacts.ArtifactStorageError:
         raise
     except Exception as exc:  # noqa: BLE001
-        logger.warning("docking figure failed: %s", exc)
+        warning = f"Docking figure could not be produced ({type(exc).__name__}): {exc}"
+        logger.warning("%s", warning)
+        warnings.append(warning)
     expected = [r for r in res["per_protein"] if r["expected_trend"]]
     opposite = [r for r in res["per_protein"] if not r["expected_trend"]]
     n_tot = len(res["per_protein"])
@@ -134,7 +172,8 @@ def docking_analysis() -> dict:
     return {
         "answer": {**res, "n_expected_trend": len(expected), "n_opposite_trend": len(opposite),
                    "finding": head + tail},
-        "metadata": {"figure": fig, "paper": reference.DOCKING, "reference": PAPER,
+        "metadata": {"figure": fig, "warnings": warnings,
+                     "paper": reference.DOCKING, "reference": PAPER,
                      **_chain(2, "docking_analysis")},
     }
 
@@ -291,19 +330,28 @@ def chemical_space() -> dict:
     """
     ds = load_dataset()
     fig = None
+    warnings = []
     try:
         fig = plotting.plot_chemical_space(ds)
+        warnings.extend(_artifact_warnings(fig))
     except artifacts.ArtifactStorageError:
         raise
     except Exception as exc:  # noqa: BLE001
-        logger.warning("t-SNE figure failed: %s", exc)
+        warning = f"Chemical-space figure could not be produced ({type(exc).__name__}): {exc}"
+        logger.warning("%s", warning)
+        warnings.append(warning)
     # Measure the overlap instead of asserting it: for each metabolite, is its nearest labelled
     # neighbour (ECFP4 Tanimoto) an ACTIVE pesticide, and how similar is it?
     overlap = None
     try:
         overlap = docking.metabolite_pesticide_overlap(ds)
     except Exception as exc:  # noqa: BLE001
-        logger.warning("overlap statistic failed: %s", exc)
+        warning = (
+            "Chemical-space overlap statistic could not be computed "
+            f"({type(exc).__name__}): {exc}"
+        )
+        logger.warning("%s", warning)
+        warnings.append(warning)
     if overlap:
         band = ("substantially" if overlap["frac_nn_active"] >= 0.5 else
                 "partially" if overlap["frac_nn_active"] >= 0.25 else "only marginally")
@@ -318,11 +366,25 @@ def chemical_space() -> dict:
     else:
         finding = ("The chemical-space overlap statistic could not be computed in this call; the "
                    "figure alone is not evidence of overlap.")
+    route = _chain(1, "chemical_space")
+    if overlap is None:
+        route.update({
+            "next_tools": [],
+            "next_tools_reason": (
+                "Question 1 cannot complete until the numerical overlap statistic is available."
+            ),
+            "workflow_status": "awaiting_retry",
+            "question_status": "evidence_unavailable",
+            "retry_tool": "chemical_space",
+            "retry_parameters": {},
+        })
+        route.pop("next_question", None)
     return {
         "answer": {**(overlap or {}), "finding": finding},
-        "metadata": {"figure": fig, "method": "differential scaffold fingerprint + t-SNE; overlap "
+        "metadata": {"figure": fig, "warnings": warnings,
+                     "method": "differential scaffold fingerprint + t-SNE; overlap "
                                               "measured as ECFP4 Tanimoto nearest-neighbour class",
-                     "reference": PAPER, **_chain(1, "chemical_space")},
+                     "reference": PAPER, **route},
     }
 
 
@@ -444,6 +506,8 @@ def reproduce_all() -> dict:
         "metadata": {"reference": PAPER,
                      "method": "open analogues: RDKit, HGB/CatBoost, RMT (numpy/scipy port), "
                                "kNN+Gaussian AD; docking scores bundled from the authors",
+                     "workflow_status": "audit_fallback",
+                     "artifact_output_policy": ARTIFACT_OUTPUT_POLICY,
                      "tolerance_note": "Each check carries the tolerance it applied; read it "
                                        "before quoting a check as 'reproduced'."},
     }
@@ -604,6 +668,8 @@ def reproduce_claims() -> dict:
                                   f"as divergences, do not omit them." if not_reproduced
                                   else " (all claims reproduced)."))},
         "metadata": {"reference": PAPER,
+                     "workflow_status": "audit_fallback",
+                     "artifact_output_policy": ARTIFACT_OUTPUT_POLICY,
                      "usage": "Relay `reproduced_statement` only together with the claim's "
                               "`reproduced` flag and `method`. `narrative` includes the "
                               "non-reproduced claims prefixed [NOT REPRODUCED]."},
