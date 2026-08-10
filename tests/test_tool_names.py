@@ -47,3 +47,16 @@ def test_python_function_names_are_unchanged():
 
 def test_tool_count_is_stable():
     assert len(_tools()) == 11
+
+
+def test_question_routes_and_artifact_contract_are_complete():
+    covered = {tool for tools in srv.QUESTION_TOOLS.values() for tool in tools}
+    assert covered == set(_tools()) - {"canpest_reproduce_all", "canpest_reproduce_claims"}
+    for question, tools in srv.QUESTION_TOOLS.items():
+        for tool in tools:
+            chain = srv._chain(question, tool)
+            assert chain["question"] == srv.QUESTIONS[question]
+            assert tool not in chain["next_tools"]
+            assert "URL or path" in chain["artifact_output_policy"]
+            assert "SHA-256" in chain["artifact_output_policy"]
+            assert "task log" in chain["artifact_output_policy"]
