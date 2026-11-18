@@ -1,8 +1,0 @@
-[
-  {
-    "name": "cannabis-2026",
-    "url": "http://127.0.0.1:7341/mcp",
-    "timeout": 7200,
-    "description": "Cannabis sativa biopesticide study IJMS2026,8000: source cohort audit, six-target docking comparisons, train-only AppendixA RMT selection, RTE CatBoost/linear-SVM validation, genuine Chemprop DMPNN paired random/scaffold validation on available3171labels, public-data toxicity benchmarks/profiles and applicability. Exact final cohort/author-weight replay is unavailable; published references and new computations are distinguished. Computes paired RTE/DMPNN fusion and candidate ranking with explicit unknown secondary-metabolite annotations; all nine open toxicity endpoints are available. The same toxicity-profile tool offers recipe=nested_paper2024_v2 for completed independently replayed nested-tuning models with applied 2024 preparation; explicitly requested endpoints without completed runs are reported unavailable. The default fixed_public_v1 remains a distinct approximation."
-  }
-]

@@ -1,0 +1,36 @@
+{
+  "study": "cannabis",
+  "paper_doi": "10.3390/ijms27188000",
+  "dataset_scope": "cannabis_2026",
+  "registry_name": "cannabis-2026",
+  "description": "Cannabis biopesticide source-data study: cohort audit, stored docking comparisons, train-only AppendixA RMT selection, CatBoost/LinearSVM, Chemprop DMPNN, paired fusion and candidate ranking. Optional workers and completed model caches are required for advanced computations. Distinguish open Syntelly2024 method reconstruction from unavailable original weights and final-paper cohorts.",
+  "transport": "streamable-http",
+  "mcp_path": "/mcp",
+  "artifact_path": "/files/{sha256}.{extension}",
+  "default_port": 7341,
+  "tool_count": 9,
+  "tool_names": [
+    "cannabis2026_dataset_audit",
+    "cannabis2026_docking_comparisons",
+    "cannabis2026_evaluate_fusion",
+    "cannabis2026_open_toxicity_profile",
+    "cannabis2026_open_toxicity_validation",
+    "cannabis2026_prioritize_candidates",
+    "cannabis2026_select_residues",
+    "cannabis2026_validate_dmpnn",
+    "cannabis2026_validate_rte"
+  ],
+  "smoke_tool": "cannabis2026_dataset_audit",
+  "core_repository": "https://github.com/chemagents/chem-repro-suite",
+  "core_commit": "a2d980330bd90275722d401c6c9ca246a536dd01",
+  "deployment": {
+    "shared_endpoint": null,
+    "status": "not_deployed",
+    "endpoint_supplied_by": "CoScientist deployment operator"
+  },
+  "compatibility_checked_against": "aimclub/CoScientist_dev@900aeae29d77416a798bdf706bc1c6df8d8e1911",
+  "smoke_metrics": {
+    "source_records": 5920,
+    "labeled_records": 3171
+  }
+}

@@ -7,3 +7,8 @@ artifacts/
 outputs/
 *.log
 .DS_Store
+
+deployment/
+worker_configuration.json
+workers/
+*.headers.json

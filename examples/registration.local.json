@@ -1,0 +1,7 @@
+[
+  {
+    "name": "cannabis-2026",
+    "url": "http://127.0.0.1:7341/mcp",
+    "description": "Cannabis biopesticide source-data study: cohort audit, stored docking comparisons, train-only AppendixA RMT selection, CatBoost/LinearSVM, Chemprop DMPNN, paired fusion and candidate ranking. Optional workers and completed model caches are required for advanced computations. Distinguish open Syntelly2024 method reconstruction from unavailable original weights and final-paper cohorts."
+  }
+]

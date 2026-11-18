@@ -1,0 +1,3745 @@
+{
+  "core_commit": "a2d980330bd90275722d401c6c9ca246a536dd01",
+  "study": "cannabis",
+  "tools": [
+    {
+      "name": "cannabis2026_dataset_audit",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nWhich Cannabis source cohorts and six residue-energy matrices are available, and do they\nmatch the final article? Audit IDs/structures, 3171 labels, 2749 unlabeled source rows and missing\nfinal 2465/5027 DS1 cohort mapping. AChE-inactive references are not universal non-pesticides.\nReturn the separately reported raw/standardized/docking-prepared flow for all three paper cohorts.\nAlso return the bundled original paper PDF as a source-reference artifact for CoScientist's existing paper reader.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_docking_comparisons",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDo registered pesticides and AChE-inactive references have different docking profiles?\nRecompute six two-sided Mann–Whitney tests, BH FDR, median differences and distributions.\nDoes not rerun Vina; tests source scores. Final DS1 subset remains unmapped.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_select_residues",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nWhich target residues survive Appendix A's training-only RMT and 98% energy-contribution gate?\nFit on an explicit source outer split; choose top-m by inner-validation ROC-AUC on cumulative raw\nenergies, retain original columns, export split registry and train/test features. Returns spectrum,\nfull m scan and contribution audit. This is not the older global RMT95/point-biserial protocol.\nUnreported numerical choices and unverified final-paper split equivalence are explicitly disclosed.",
+      "inputSchema": {
+        "properties": {
+          "target": {
+            "default": "GLC1",
+            "enum": [
+              "GSTE2",
+              "ACHE",
+              "GLC1",
+              "UGT202A2",
+              "GSTM12",
+              "OR28"
+            ],
+            "type": "string"
+          },
+          "split_index": {
+            "default": 0,
+            "maximum": 29,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "inner_splits": {
+            "default": 5,
+            "maximum": 10,
+            "minimum": 2,
+            "type": "integer"
+          },
+          "inner_test_size": {
+            "default": 0.2,
+            "maximum": 0.4,
+            "minimum": 0.1,
+            "type": "number"
+          },
+          "seed": {
+            "default": 42,
+            "maximum": 2147483647,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_validate_rte",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDo RTE features discriminate pesticide and AChE-inactive reference compounds? Actually fit\nCatBoost and linear SVM for all six proteins and ALL6, with Appendix A residue selection refitted\non each requested source outer split; default is all 30 source splits (420 fits).\nA configured execution cache is verified against archived algorithm/software/source data and\nmetrics are recomputed from held-out scores; cached fits are explicitly distinguished from new training.\nReturn ROC-AUC, both PR area definitions, FPR, recall,\nconfusion counts and downloaded held-out predictions. Optionally export fitted models. Source\nfolds and explicit unspecified hyperparameter choices are not asserted to match final-paper runs.",
+      "inputSchema": {
+        "properties": {
+          "split_indices": {
+            "anyOf": [
+              {
+                "items": {
+                  "maximum": 29,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 30,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "iterations": {
+            "default": 500,
+            "maximum": 1000,
+            "minimum": 10,
+            "type": "integer"
+          },
+          "include_models": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_open_toxicity_validation",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_open_tox_2026.\nReproduce Supplement S3's open toxicity benchmark: five base learners, mean blend and source\nmeta-stack on pinned TOXRIC data. Uses a separately pinned worker environment and actual saved\nOOF predictions; cached runs are verified. Source meta CV is not strictly nested or scaffold-disjoint.\nThese open benchmarks do not replace main-text Syntelly outputs. Reproductive has no scaffold reference.\nThe two aquatic endpoints expose separate TOXRIC-only and augmented TOXRIC+ECOTOX cohorts;\nsample counts and estimator choices must remain explicit in random/scaffold comparisons.",
+      "inputSchema": {
+        "properties": {
+          "endpoint": {
+            "default": "ames",
+            "enum": [
+              "ames",
+              "reproductive",
+              "daphnia",
+              "fathead"
+            ],
+            "type": "string"
+          },
+          "scheme": {
+            "default": "random",
+            "enum": [
+              "random",
+              "source_scaffold"
+            ],
+            "type": "string"
+          },
+          "cohort": {
+            "default": "toxric",
+            "enum": [
+              "toxric",
+              "toxric_ecotox"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_open_tox_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_open_toxicity_profile",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nHow do the available Cannabis compounds compare with pesticide references under open\ntoxicity models, and how applicable are the predictions? Fit the existing ChemAgents open\ntwo-booster approximation motivated by Syntelly 2024, validate identity-random/scaffold 5-fold,\nand predict every source compound. Return per-compound values, cohort comparisons, kNN domain\nscores and training overlap. Uses verified caches after the first CPU run. These are new open\npredictions; final-paper Syntelly weights/cohorts and absolute aquatic units are unavailable.\nIncludes named predictions and endpoint-specific domain/overlap matrices for all ten reviewed\nFigure4 connectivities, with full candidate-level CSV evidence. These are source-model estimates.\nhERG is channel blockade; a separate broad hepatotoxicity output is not invented from DILI.\nrecipe=nested_paper2024_v2 replays completed nested-tuning runs with applied 2024 preparation,\ninner-fold feature selection and verified saved models. Request explicit endpoints; unavailable\ncompleted runs are reported as unavailable, without falling back to fixed-v1 predictions.",
+      "inputSchema": {
+        "properties": {
+          "endpoints": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "ames",
+                    "reproductive",
+                    "daphnia",
+                    "fathead",
+                    "dili",
+                    "herg",
+                    "carcinogens_lagunin",
+                    "mouse_oral_ld50",
+                    "rat_oral_ld50"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 9,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "recipe": {
+            "default": "fixed_public_v1",
+            "enum": [
+              "fixed_public_v1",
+              "nested_paper2024_v2"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_validate_dmpnn",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDoes the structure-based Cannabis DMPNN transfer to unseen scaffolds? Actually train Chemprop\ndirected-bond message passing plus train-normalized RDKit2D descriptors under the published\ndepth3/hidden300/dropout0.1/mean-sum-norm configuration. paired_cv evaluates both random and\nscaffold five-fold CV, with separate validation subsets, best checkpoints and complete held-out\npredictions. source_random uses the existing RTE outer split registry for matched fusion studies;\nit defaults to all30source splits, or the explicitly requested indices. Original final3403labels\nand author fold/checkpoint details are absent: the available3171labels are used and all deviations\ndeclared. PR trapezoidal area and average precision are separate; class scores are not measured\npesticide efficacy. Long CPU training is cached; incomplete runs resume only completed verified folds.",
+      "inputSchema": {
+        "properties": {
+          "protocol": {
+            "default": "paired_cv",
+            "enum": [
+              "paired_cv",
+              "source_random"
+            ],
+            "type": "string"
+          },
+          "source_split_indices": {
+            "anyOf": [
+              {
+                "items": {
+                  "maximum": 29,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 30,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "max_epochs": {
+            "default": 60,
+            "maximum": 200,
+            "minimum": 20,
+            "type": "integer"
+          },
+          "include_models": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_evaluate_fusion",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDoes multiplying Cannabis DMPNN and RTE scores improve held-out classification?\nTrain an ALL6 CatBoost branch with AppendixA train-only residue selection on exactly the\nstructural outer partitions. Compare both branches and product at threshold0.5: ROC-AUC,\nboth PR-area definitions, FPR, recall, confusion counts and positive retention. Return all\nmatched held-out/query predictions and optional model exports. Reuse verified DMPNN fits.\nProduct is not a calibrated joint posterior; lower FPR may accompany lower recall. Available\nsource cohort and reconstructed folds are not claimed to reproduce author final checkpoints.",
+      "inputSchema": {
+        "properties": {
+          "protocol": {
+            "default": "paired_cv",
+            "enum": [
+              "paired_cv",
+              "source_random"
+            ],
+            "type": "string"
+          },
+          "source_split_indices": {
+            "anyOf": [
+              {
+                "items": {
+                  "maximum": 29,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 30,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "max_epochs": {
+            "default": 60,
+            "maximum": 200,
+            "minimum": 20,
+            "type": "integer"
+          },
+          "iterations": {
+            "default": 500,
+            "maximum": 1000,
+            "minimum": 10,
+            "type": "integer"
+          },
+          "include_models": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "cannabis2026_prioritize_candidates",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nWhich Cannabis candidates rank highest, and can Figure4 be reproduced?\nReturn the published top10 names/rounded product scores separately from new source-cohort\nprobabilities and ranks. Computed mode uses cached paired DMPNN/RTE ensembles and the0.70\nstructural screen. Secondary-metabolite/occurrence annotations require an explicit source and\nmatching SMILES; missing annotation stays unknown and is never silently excluded as primary.\nNo0.5final-ranking cutoff or toxicity selection is applied. reference_only skips model fits.\nReviewed Figure4 graphs are linked to exact source records: return their identity evidence and,\nin computed mode, newly reconstructed component probabilities separately from reported scores.\nWithout author final CCD cohort/annotations, original component scores and exact final selection\nremain unavailable; no names, biological occurrence or separate probabilities are invented.",
+      "inputSchema": {
+        "properties": {
+          "annotations": {
+            "anyOf": [
+              {
+                "items": {
+                  "properties": {
+                    "ligand_id": {
+                      "type": "integer"
+                    },
+                    "source_smiles": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "is_secondary_metabolite": {
+                      "type": "boolean"
+                    },
+                    "annotation_source": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "occurrence_evidence": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "ligand_id",
+                    "source_smiles",
+                    "is_secondary_metabolite",
+                    "annotation_source"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "reference_only": {
+            "default": false,
+            "type": "boolean"
+          },
+          "scheme": {
+            "default": "random",
+            "enum": [
+              "random",
+              "scaffold"
+            ],
+            "type": "string"
+          },
+          "max_epochs": {
+            "default": 60,
+            "maximum": 200,
+            "minimum": 20,
+            "type": "integer"
+          },
+          "iterations": {
+            "default": 500,
+            "maximum": 1000,
+            "minimum": 10,
+            "type": "integer"
+          }
+        },
+        "type": "object",
+        "x-data-contract": {
+          "input_mode": "fixed_dataset",
+          "dataset_scope": "cannabis_2026",
+          "optional_numeric_defaults_are_operational": true
+        }
+      },
+      "outputSchema": {
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "success",
+              "partial",
+              "unsupported"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "properties": {
+              "finding": {
+                "type": "string"
+              },
+              "metrics": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "unit": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "population": {
+                      "type": "string"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value",
+                    "population"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "tables": {
+                "additionalProperties": {
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "columns": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "rows": {
+                      "items": {
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "evidence_kind": {
+                      "default": "computed",
+                      "enum": [
+                        "computed",
+                        "paper_reported",
+                        "source_record"
+                      ],
+                      "type": "string"
+                    },
+                    "total_rows": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "is_preview": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "full_table_artifact_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "columns",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "limitations": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "default": "warning",
+                      "enum": [
+                        "info",
+                        "warning",
+                        "error"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "finding"
+            ],
+            "type": "object"
+          },
+          "metadata": {
+            "properties": {
+              "study_id": {
+                "type": "string"
+              },
+              "paper_doi": {
+                "type": "string"
+              },
+              "protocol_id": {
+                "type": "string"
+              },
+              "protocol_parameters": {
+                "additionalProperties": {},
+                "type": "object"
+              },
+              "sources": {
+                "items": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    },
+                    "revision": {
+                      "type": "string"
+                    },
+                    "derivation": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "parent_sha256": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "source_url",
+                    "revision"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "software": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "implementation_sha256": {
+                "anyOf": [
+                  {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "reused_from_cache": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "study_id",
+              "paper_doi",
+              "protocol_id",
+              "sources",
+              "software"
+            ],
+            "type": "object"
+          },
+          "artifacts": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "download_url": {
+                  "type": "string"
+                },
+                "artifact": {
+                  "type": "string"
+                },
+                "scope": {
+                  "default": "http",
+                  "enum": [
+                    "http",
+                    "s3"
+                  ],
+                  "type": "string"
+                },
+                "bucket": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "s3_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "presigned_url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "name",
+                "media_type",
+                "sha256",
+                "size_bytes",
+                "download_url",
+                "artifact"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "meta": {
+        "_fastmcp": {
+          "tags": []
+        }
+      }
+    }
+  ]
+}
