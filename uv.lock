@@ -251,7 +251,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "chem-repro-suite", git = "https://github.com/chemagents/chem-repro-suite.git?rev=438b4e43fafe74bde1da67e3a6fe6ccb4548f313" }]
+requires-dist = [{ name = "chem-repro-suite", git = "https://github.com/chemagents/chem-repro-suite.git?rev=a2d980330bd90275722d401c6c9ca246a536dd01" }]
 
 [[package]]
 name = "catboost"
@@ -349,8 +349,8 @@ wheels = [
 
 [[package]]
 name = "chem-repro-suite"
-version = "0.4.2"
-source = { git = "https://github.com/chemagents/chem-repro-suite.git?rev=438b4e43fafe74bde1da67e3a6fe6ccb4548f313#438b4e43fafe74bde1da67e3a6fe6ccb4548f313" }
+version = "0.4.3"
+source = { git = "https://github.com/chemagents/chem-repro-suite.git?rev=a2d980330bd90275722d401c6c9ca246a536dd01#a2d980330bd90275722d401c6c9ca246a536dd01" }
 dependencies = [
     { name = "boto3" },
     { name = "catboost" },
