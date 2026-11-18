@@ -1,0 +1,28 @@
+{
+  "verified_software": {
+    "chemprop": {
+      "chemprop": "2.2.1",
+      "torch": "2.10.0",
+      "lightning": "2.6.6",
+      "numpy": "2.2.6",
+      "pandas": "2.3.3",
+      "rdkit": "2026.3.3",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.15.3"
+    },
+    "open-tox": {
+      "catboost": "1.2.10",
+      "joblib": "1.5.3",
+      "lightgbm": "4.7.0",
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "rdkit": "2026.3.5",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.4.0"
+    }
+  },
+  "scope": "Existing pinned macOS worker environments checked through the installed public package; not a fresh Linux ML installation",
+  "training_started": false
+}

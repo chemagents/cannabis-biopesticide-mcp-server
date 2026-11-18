@@ -1,0 +1,13 @@
+{
+  "runtime": "pinned public Git commit67da192",
+  "environment": "validated shared dependency environment; clean Linux install is checked by CI",
+  "check": {
+    "study": "cannabis",
+    "tool_count": 9,
+    "tool": "cannabis2026_dataset_audit",
+    "status": "partial",
+    "verified_downloads": 6,
+    "scope": "Actual HTTP MCP smoke check; not a complete paper or CoScientist E2E acceptance"
+  },
+  "full_coscientist_report_acceptance": "ongoing"
+}

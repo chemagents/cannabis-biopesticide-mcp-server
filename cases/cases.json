@@ -1,0 +1,148 @@
+[
+  {
+    "id": "C01",
+    "study": "cannabis",
+    "prompt": "Какие соединения входят в исходный, стандартизованный и подготовленный к докингу наборы Cannabis sativa из IJMS 2026, 27, 8000? Воспроизведи поток отбора и объясни, насколько подготовленный набор представляет полный метаболом.",
+    "expected_tools": [
+      "cannabis2026_dataset_audit"
+    ],
+    "scientific_checks": [
+      "source5920=1680+1491+2749;paperDS15027/docked2465",
+      "final cohort mapping missing;no arbitrary truncation"
+    ],
+    "tool_readiness": "partial"
+  },
+  {
+    "id": "C02",
+    "study": "cannabis",
+    "prompt": "Отличаются ли докинговые профили пестицидов и AChE-неактивных контролей в статье Cannabis? Пересчитай сравнения для всех мишеней, медианные разности и поправку на множественные проверки; не скрывай противоположное направление эффекта.",
+    "expected_tools": [
+      "cannabis2026_docking_comparisons"
+    ],
+    "scientific_checks": [
+      "6targets;two-sidedMW;BH;OR28opposite",
+      "DS3isAChEinactive not universal inactivity"
+    ],
+    "tool_readiness": "implemented"
+  },
+  {
+    "id": "C03",
+    "study": "cannabis",
+    "prompt": "Какие аминокислотные остатки информативны в статье Cannabis? Для всех мишеней воспроизведи отбор по Appendix A на нулевом сохранённом внешнем разбиении: RMT-спектр, выбор числа остатков во внутренней валидации, энергетический фильтр и применение к test. Покажи отсутствие использования test при отборе.",
+    "expected_tools": [
+      "cannabis2026_select_residues"
+    ],
+    "scientific_checks": [
+      "6target calls;training-only;ROC-AUC;98%gate;raw retained columns",
+      "unspecified numerical settings and final split equivalence disclosed"
+    ],
+    "tool_readiness": "implemented"
+  },
+  {
+    "id": "C04",
+    "study": "cannabis",
+    "prompt": "Содержат ли RTE-дескрипторы информацию для различения пестицидов и AChE-неактивных соединений? Воспроизведи CatBoost и линейный SVM отдельно по мишеням и по объединённым дескрипторам с отбором признаков внутри каждого внешнего разбиения.",
+    "expected_tools": [
+      "cannabis2026_validate_rte"
+    ],
+    "scientific_checks": [
+      "6targets+combined;two models;source split audit",
+      "420 actual fits and model roundtrips verified; final-paper fold/config equivalence unverified, ALL6CB.82175vsreported.802"
+    ],
+    "tool_readiness": "partial"
+  },
+  {
+    "id": "C05",
+    "study": "cannabis",
+    "prompt": "Как структурная DMPNN Cannabis переносится на новые каркасы? Воспроизведи парную случайную и каркасную валидацию одной конфигурации, с ROC-AUC и PR-AUC, и отдели её от основного random-CV результата статьи.",
+    "expected_tools": [
+      "cannabis2026_validate_dmpnn"
+    ],
+    "scientific_checks": [
+      "paired .9260/.9393 vs .9084/.9297 are references, not computations until run",
+      "final DMPNN training artifacts/config missing"
+    ],
+    "tool_readiness": "partial",
+    "direct_mcp_evidence": "Actual source-cohort execution and artifacts verified; exact final-paper reconstruction and root acceptance remain separate requirements."
+  },
+  {
+    "id": "C06",
+    "study": "cannabis",
+    "prompt": "Действительно ли произведение структурного и RTE-скоров уменьшает ложноположительные предсказания Cannabis? На одинаковых held-out объектах сравни обе ветви и произведение: ROC-AUC, PR-AUC, FPR, recall, confusion matrix и покрытие при оценочном пороге статьи.",
+    "expected_tools": [
+      "cannabis2026_evaluate_fusion"
+    ],
+    "scientific_checks": [
+      "threshold.5;FPR12.20%vs4.92%references",
+      "recall loss and coverage;product not calibrated joint posterior"
+    ],
+    "tool_readiness": "partial",
+    "direct_mcp_evidence": "Actual source-cohort execution and artifacts verified; exact final-paper reconstruction and root acceptance remain separate requirements."
+  },
+  {
+    "id": "C07",
+    "study": "cannabis",
+    "prompt": "Какие метаболиты Cannabis входят в итоговую десятку и почему? Воспроизведи исходный структурный отбор, исключение первичных метаболитов и сортировку по произведению скоров. Верни обе вероятности, структуры, происхождение и изменившиеся позиции.",
+    "expected_tools": [
+      "cannabis2026_prioritize_candidates"
+    ],
+    "scientific_checks": [
+      "DMPNN candidate cutoff.70;ranking not hard final cutoff.5",
+      "requires final prediction/cohort/occurrence records",
+      "10 reviewed Figure4 connectivities map to pinned source IDs; newly computed source components stay separate from unavailable original author components; ranks1/9 classification-reference overlap explicit"
+    ],
+    "tool_readiness": "partial",
+    "direct_mcp_evidence": "Actual source-cohort execution and artifacts verified; exact final-paper reconstruction and root acceptance remain separate requirements."
+  },
+  {
+    "id": "C08",
+    "study": "cannabis",
+    "prompt": "Благоприятнее ли предсказанный токсикологический и экотоксикологический профиль Cannabis по сравнению с пестицидами? Воспроизведи сравнения по каждому эндпойнту и для итоговых кандидатов, сохранив единицы, применимость и происхождение моделей.",
+    "expected_tools": [
+      "cannabis2026_open_toxicity_profile"
+    ],
+    "scientific_checks": [
+      "Explicitly distinguish new public-data model predictions from paper-reported Syntelly outputs",
+      "Available cohort2749unlabeled/1680pesticide/1491AChE; do not claim final5027/1709or top-ten replay",
+      "Endpoint-specific units, OOF validation, identity/scaffold overlap and applicability",
+      "hERG is a proxy; no separate broad hepatotoxicity result inferred from DILI",
+      "Domain score is not calibrated reliability; ranking does not establish efficacy or environmental safety",
+      "Existing open recipe omits original2024 tuning/custom-fragment filters; disclose this",
+      "all10 mapped Figure4 structures have computed source-model predictions for all9 requested endpoints, with full90rowCSV and complete compact matrices; no proprietary Syntelly or occurrence claim"
+    ],
+    "tool_readiness": "partial"
+  },
+  {
+    "id": "C09",
+    "study": "cannabis",
+    "prompt": "Насколько надёжен вывод о безопасности приоритетных биопестицидов Cannabis? Проверь область применимости каждого токсикологического прогноза, ошибки моделей и ограничения исходных AChE-контролей; перечисли, что ещё требует эксперимента.",
+    "expected_tools": [
+      "cannabis2026_open_toxicity_profile",
+      "cannabis2026_dataset_audit"
+    ],
+    "scientific_checks": [
+      "Explicitly distinguish new public-data model predictions from paper-reported Syntelly outputs",
+      "Available cohort2749unlabeled/1680pesticide/1491AChE; do not claim final5027/1709or top-ten replay",
+      "Endpoint-specific units, OOF validation, identity/scaffold overlap and applicability",
+      "hERG is a proxy; no separate broad hepatotoxicity result inferred from DILI",
+      "Domain score is not calibrated reliability; ranking does not establish efficacy or environmental safety",
+      "Existing open recipe omits original2024 tuning/custom-fragment filters; disclose this"
+    ],
+    "tool_readiness": "partial"
+  },
+  {
+    "id": "C10",
+    "study": "cannabis",
+    "prompt": "Воспроизведи открытые токсикологические бенчмарки из Supplementary Table S3 статьи Cannabis: Ames, reproductive toxicity, Daphnia и fathead minnow, при опубликованных вариантах разбиения. Для каждого числа укажи фактический набор и число записей, базовую модель или способ объединения, полученную метрику и сверку с публикацией. Проверь, можно ли интерпретировать разницу random/scaffold как чистый штраф переноса; отдельно оцени независимость валидации метамодели. Не подменяй этими бенчмарками основные профили Syntelly.",
+    "expected_tools": [
+      "cannabis2026_open_toxicity_validation"
+    ],
+    "scientific_checks": [
+      "All seven reported entries compared against actual cached or freshly executed source replays",
+      "Ames7460 uses fixed mean blend; reproductive156 matches CatBoost-ECFP; water scaffold references match augmented614/1100 cohorts, whereas random references match345/812",
+      "Meta CV is non-nested and does not preserve scaffold groups; mixed cohort/aggregator comparisons are not paired split penalties",
+      "Main-text Syntelly outputs remain distinct and unavailable"
+    ],
+    "tool_readiness": "implemented"
+  }
+]

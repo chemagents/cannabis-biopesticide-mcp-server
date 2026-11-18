@@ -1,7 +1,9 @@
 .venv/
 __pycache__/
-*.pyc
-artifacts/
-model_cache/
+*.py[cod]
 .env
-catboost_info/
+.env.*
+artifacts/
+outputs/
+*.log
+.DS_Store

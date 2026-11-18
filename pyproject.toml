@@ -1,66 +1,144 @@
 [project]
 name = "cannabis-biopesticide-mcp-server"
-version = "0.1.0"
-description = "MCP server reproducing the docking-informed, RMT-denoised biopesticide QSAR of the Cannabis sativa metabolome"
-requires-python = ">=3.11,<3.13"
-dependencies = [
-    "fastmcp>=2.14.5",
-    "pydantic-settings>=2.0",
-    "rdkit>=2024.3",
-    "numpy>=1.26",
-    "pandas>=2.0",
-    "scipy>=1.11",
-    "scikit-learn>=1.3",
-    "catboost>=1.2",
-    "matplotlib>=3.8",
-    "seaborn>=0.13",
-    "joblib>=1.3",
-    "boto3>=1.34",
-]
-
-[dependency-groups]
-dev = ["pytest>=8"]
-
-[project.optional-dependencies]
-# Exact DMPNN reproduction (heavy, torch). The default HGB backend reproduces ROC-AUC ~0.93
-# without torch, so this is optional.
-dmpnn = ["torch>=2.2"]
-# Open reproduction of the Syntelly toxicity models (server/tox/ on server/data/tox/). Torch-free
-# gradient-boosting ensemble; catboost is already a core dep, this adds the two other learners.
-tox = ["xgboost>=2.0", "lightgbm>=4.0"]
+version = "0.2.1"
+description = "Scientific MCP server for cannabis; shared ChemAgents runtime"
+requires-python = ">=3.12,<3.13"
+dependencies = ["chem-repro-suite @ git+https://github.com/chemagents/chem-repro-suite.git@67da19228ed187a971d03790579d669ca5b5a16a"]
 
 [project.scripts]
-cannabis-biopesticide-mcp-server = "server.canpest_server:main"
-
-[tool.hatch.build.targets.wheel]
-packages = ["server"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"server/data/canpest_data.csv" = "server/data/canpest_data.csv"
-"server/data/rte.csv" = "server/data/rte.csv"
-"server/data/fp_rdkit2d.npy" = "server/data/fp_rdkit2d.npy"
-"server/data/split_registry.csv" = "server/data/split_registry.csv"
-"server/data/split_registry_scaffold.csv" = "server/data/split_registry_scaffold.csv"
-"server/data/dmpnn_pred.csv" = "server/data/dmpnn_pred.csv"
-"server/data/reference/confidence_ablation.json" = "server/data/reference/confidence_ablation.json"
-"server/data/reference/confidence_reliability.png" = "server/data/reference/confidence_reliability.png"
-"server/data/reference/dmpnn_stack_rmt_cv.json" = "server/data/reference/dmpnn_stack_rmt_cv.json"
-"server/data/reference/dmpnn_stack_reliability.json" = "server/data/reference/dmpnn_stack_reliability.json"
-"server/data/tox/toxric_ames.csv" = "server/data/tox/toxric_ames.csv"
-"server/data/tox/toxric_reproductive.csv" = "server/data/tox/toxric_reproductive.csv"
-"server/data/tox/toxric_developmental.csv" = "server/data/tox/toxric_developmental.csv"
-"server/data/tox/toxric_daphnia.csv" = "server/data/tox/toxric_daphnia.csv"
-"server/data/tox/toxric_fathead.csv" = "server/data/tox/toxric_fathead.csv"
-"server/data/tox/daphnia_aug.csv" = "server/data/tox/daphnia_aug.csv"
-"server/data/tox/fathead_aug.csv" = "server/data/tox/fathead_aug.csv"
-"server/data/tox/table3_metabolites_open.csv" = "server/data/tox/table3_metabolites_open.csv"
-"server/data/tox/table4_pesticides_open.csv" = "server/data/tox/table4_pesticides_open.csv"
-"server/data/tox/section35_open.json" = "server/data/tox/section35_open.json"
-"server/data/tox/section35_open_clean.json" = "server/data/tox/section35_open_clean.json"
+cannabis-biopesticide-mcp-server = "cannabis_biopesticide_mcp:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.pytest.ini_options]
-markers = ["slow: long-running reproduction tests (RMT inner-CV, model training)"]
+[tool.hatch.build.targets.wheel]
+packages = ["cannabis_biopesticide_mcp"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv]
+constraint-dependencies = [
+  "annotated-doc==0.0.6",
+  "annotated-types==0.8.0",
+  "anyio==4.16.0",
+  "attrs==26.1.0",
+  "authlib==1.9.6",
+  "beartype==0.23.1",
+  "boto3==1.44.3",
+  "botocore==1.44.3",
+  "burner-redis==0.1.7",
+  "cachetools==8.0.0",
+  "catboost==1.2.8",
+  "certifi==2026.10.23",
+  "cffi==2.1.1",
+  "charset-normalizer==3.5.2",
+  "click==8.5.1",
+  "cloudpickle==3.1.2",
+  "colorama==0.4.6",
+  "contourpy==1.4.0",
+  "cronsim==2.8",
+  "cryptography==50.0.2",
+  "cssselect2==0.10.1",
+  "cycler==0.12.1",
+  "cyclopts==5.5.0",
+  "diskcache==5.6.3",
+  "dnspython==2.9.2",
+  "docstring-parser==0.18.0",
+  "email-validator==2.4.0",
+  "exceptiongroup==1.3.1",
+  "fakeredis==2.34.1",
+  "fastmcp==2.14.7",
+  "fonttools==4.68.0",
+  "graphviz==0.21",
+  "h11==0.16.0",
+  "httpcore==1.0.9",
+  "httpx-sse==0.4.3",
+  "httpx==0.28.1",
+  "idna==3.20",
+  "iniconfig==2.3.1",
+  "jaraco-classes==3.4.0",
+  "jaraco-context==6.1.2",
+  "jaraco-functools==4.6.0",
+  "jeepney==0.9.0",
+  "jmespath==1.1.0",
+  "joblib==1.6.0",
+  "joserfc==1.8.0",
+  "jsonref==1.1.0",
+  "jsonschema-path==0.5.0",
+  "jsonschema-specifications==2025.9.1",
+  "jsonschema==4.26.0",
+  "keyring==25.7.0",
+  "kiwisolver==1.5.1",
+  "lupa==2.8",
+  "lxml==6.1.3",
+  "markdown-it-py==4.3.0",
+  "matplotlib==3.11.2",
+  "mcp==1.30.0",
+  "mdurl==0.1.2",
+  "more-itertools==11.2.1",
+  "narwhals==2.28.0",
+  "numpy==2.5.4",
+  "openapi-pydantic==0.6.0",
+  "opentelemetry-api==1.45.2",
+  "packaging==26.3",
+  "pandas==2.3.3",
+  "pathable==0.6.0",
+  "pathvalidate==3.3.1",
+  "pillow==13.0.0",
+  "platformdirs==4.14.5",
+  "plotly==7.1.0",
+  "pluggy==1.7.0",
+  "prometheus-client==0.26.0",
+  "py-key-value-aio==0.3.0",
+  "py-key-value-shared==0.3.0",
+  "pycparser==3.12",
+  "pydantic-core==2.50.4",
+  "pydantic-settings==2.16.3",
+  "pydantic==2.14.3",
+  "pydocket==0.28.0",
+  "pygments==2.21.0",
+  "pyjwt==2.15.1",
+  "pyparsing==3.3.3",
+  "pyperclip==1.11.0",
+  "pytest-asyncio==1.5.0",
+  "pytest==9.2.0",
+  "python-dateutil==2.9.0.post0",
+  "python-dotenv==1.2.4",
+  "python-json-logger==4.2.0",
+  "python-multipart==0.0.33",
+  "pytz==2026.6",
+  "pywin32-ctypes==0.2.3",
+  "pywin32==312",
+  "pyyaml==6.0.3",
+  "rdkit==2026.3.3",
+  "redis==8.1.0",
+  "referencing==0.37.0",
+  "reportlab==4.5.1",
+  "rich-rst==2.2.0",
+  "rich==15.0.0",
+  "rpds-py==2026.9.1",
+  "ruff==0.17.5",
+  "s3transfer==0.19.3",
+  "scikit-learn==1.6.1",
+  "scipy==1.18.1",
+  "secretstorage==3.5.0",
+  "shellingham==1.5.4",
+  "six==1.17.0",
+  "sortedcontainers==2.4.0",
+  "sse-starlette==3.7.0",
+  "starlette==1.10.0",
+  "svglib==1.5.1",
+  "threadpoolctl==3.8.0",
+  "tinycss2==1.5.1",
+  "typer==0.29.1",
+  "typing-extensions==4.16.0",
+  "typing-inspection==0.4.5",
+  "tzdata==2026.6",
+  "uncalled-for==0.6.1",
+  "urllib3==2.8.0",
+  "uvicorn==0.54.0",
+  "webencodings==0.6.1",
+  "websockets==17.4",
+]
