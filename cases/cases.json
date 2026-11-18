@@ -2,7 +2,7 @@
   {
     "id": "C01",
     "study": "cannabis",
-    "prompt": "Какие соединения входят в исходный, стандартизованный и подготовленный к докингу наборы Cannabis sativa из IJMS 2026, 27, 8000? Воспроизведи поток отбора и объясни, насколько подготовленный набор представляет полный метаболом.",
+    "prompt": "Which compounds occur in the source, standardized and docking-prepared Cannabis sativa datasets (IJMS 2026, 27, 8000)? Reconstruct the selection flow and explain how well the prepared set represents the full metabolome.",
     "expected_tools": [
       "cannabis2026_dataset_audit"
     ],
@@ -15,7 +15,7 @@
   {
     "id": "C02",
     "study": "cannabis",
-    "prompt": "Отличаются ли докинговые профили пестицидов и AChE-неактивных контролей в статье Cannabis? Пересчитай сравнения для всех мишеней, медианные разности и поправку на множественные проверки; не скрывай противоположное направление эффекта.",
+    "prompt": "Do pesticide and AChE-inactive control docking profiles differ in the Cannabis study? Recompute all target comparisons, median differences and multiple-testing correction, retaining opposite effect directions.",
     "expected_tools": [
       "cannabis2026_docking_comparisons"
     ],
@@ -28,7 +28,7 @@
   {
     "id": "C03",
     "study": "cannabis",
-    "prompt": "Какие аминокислотные остатки информативны в статье Cannabis? Для всех мишеней воспроизведи отбор по Appendix A на нулевом сохранённом внешнем разбиении: RMT-спектр, выбор числа остатков во внутренней валидации, энергетический фильтр и применение к test. Покажи отсутствие использования test при отборе.",
+    "prompt": "Which residues are informative in the Cannabis study? For every target, reproduce Appendix A selection on saved outer split zero: RMT spectrum, inner-validation residue count, energy filtering and application to test. Verify that test data are not used for selection.",
     "expected_tools": [
       "cannabis2026_select_residues"
     ],
@@ -41,7 +41,7 @@
   {
     "id": "C04",
     "study": "cannabis",
-    "prompt": "Содержат ли RTE-дескрипторы информацию для различения пестицидов и AChE-неактивных соединений? Воспроизведи CatBoost и линейный SVM отдельно по мишеням и по объединённым дескрипторам с отбором признаков внутри каждого внешнего разбиения.",
+    "prompt": "Do RTE descriptors distinguish pesticides from AChE-inactive compounds? Reproduce CatBoost and LinearSVM for each target and the combined descriptors, selecting features within each outer training split.",
     "expected_tools": [
       "cannabis2026_validate_rte"
     ],
@@ -54,7 +54,7 @@
   {
     "id": "C05",
     "study": "cannabis",
-    "prompt": "Как структурная DMPNN Cannabis переносится на новые каркасы? Воспроизведи парную случайную и каркасную валидацию одной конфигурации, с ROC-AUC и PR-AUC, и отдели её от основного random-CV результата статьи.",
+    "prompt": "How does the Cannabis structural DMPNN generalize to new scaffolds? Reproduce paired random and scaffold validation of one configuration with ROC-AUC and PR-AUC, separating it from the paper’s main random-CV result.",
     "expected_tools": [
       "cannabis2026_validate_dmpnn"
     ],
@@ -68,7 +68,7 @@
   {
     "id": "C06",
     "study": "cannabis",
-    "prompt": "Действительно ли произведение структурного и RTE-скоров уменьшает ложноположительные предсказания Cannabis? На одинаковых held-out объектах сравни обе ветви и произведение: ROC-AUC, PR-AUC, FPR, recall, confusion matrix и покрытие при оценочном пороге статьи.",
+    "prompt": "Does the product of Cannabis structural and RTE scores reduce false positives? On identical held-out compounds compare both components and their product using ROC-AUC, PR-AUC, FPR, recall, confusion matrices and coverage at the paper’s evaluation threshold.",
     "expected_tools": [
       "cannabis2026_evaluate_fusion"
     ],
@@ -82,7 +82,7 @@
   {
     "id": "C07",
     "study": "cannabis",
-    "prompt": "Какие метаболиты Cannabis входят в итоговую десятку и почему? Воспроизведи исходный структурный отбор, исключение первичных метаболитов и сортировку по произведению скоров. Верни обе вероятности, структуры, происхождение и изменившиеся позиции.",
+    "prompt": "Which Cannabis metabolites form the final top ten, and why? Reproduce structural screening, primary-metabolite exclusion and product-score ranking. Return both component scores, structures, provenance and changed ranks, exposing unavailable annotations.",
     "expected_tools": [
       "cannabis2026_prioritize_candidates"
     ],
@@ -97,7 +97,7 @@
   {
     "id": "C08",
     "study": "cannabis",
-    "prompt": "Благоприятнее ли предсказанный токсикологический и экотоксикологический профиль Cannabis по сравнению с пестицидами? Воспроизведи сравнения по каждому эндпойнту и для итоговых кандидатов, сохранив единицы, применимость и происхождение моделей.",
+    "prompt": "Are predicted Cannabis toxicology and ecotoxicology profiles more favorable than those of pesticides? Recompute endpoint comparisons and candidate profiles, retaining units, applicability and model provenance.",
     "expected_tools": [
       "cannabis2026_open_toxicity_profile"
     ],
@@ -115,7 +115,7 @@
   {
     "id": "C09",
     "study": "cannabis",
-    "prompt": "Насколько надёжен вывод о безопасности приоритетных биопестицидов Cannabis? Проверь область применимости каждого токсикологического прогноза, ошибки моделей и ограничения исходных AChE-контролей; перечисли, что ещё требует эксперимента.",
+    "prompt": "How reliable is a safety interpretation for prioritized Cannabis biopesticides? Check each toxicology prediction’s applicability, model errors and limitations of AChE-inactive controls, and identify what still needs experimental testing.",
     "expected_tools": [
       "cannabis2026_open_toxicity_profile",
       "cannabis2026_dataset_audit"
@@ -133,7 +133,7 @@
   {
     "id": "C10",
     "study": "cannabis",
-    "prompt": "Воспроизведи открытые токсикологические бенчмарки из Supplementary Table S3 статьи Cannabis: Ames, reproductive toxicity, Daphnia и fathead minnow, при опубликованных вариантах разбиения. Для каждого числа укажи фактический набор и число записей, базовую модель или способ объединения, полученную метрику и сверку с публикацией. Проверь, можно ли интерпретировать разницу random/scaffold как чистый штраф переноса; отдельно оцени независимость валидации метамодели. Не подменяй этими бенчмарками основные профили Syntelly.",
+    "prompt": "Reproduce the open toxicology benchmarks in Cannabis Supplementary Table S3: Ames, reproductive toxicity, Daphnia and fathead minnow under the reported splits. For each number give the actual cohort and size, base model or aggregation, measured metric and paper comparison. Assess whether random/scaffold differences isolate transfer and whether meta-model validation is independent. Keep these benchmarks separate from the main Syntelly profiles.",
     "expected_tools": [
       "cannabis2026_open_toxicity_validation"
     ],
