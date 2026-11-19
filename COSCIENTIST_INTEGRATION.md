@@ -1,6 +1,6 @@
 # CoScientist integration
 
-The server uses Streamable HTTP at `/mcp` and serves artifacts at `/files/{sha256}.{extension}`. It exposes 9 tools under registry name `cannabis-2026`. See [server.json](server.json) and [api/tools.json](api/tools.json) for the exact contract. The scientific backend is pinned to `a2d980330bd90275722d401c6c9ca246a536dd01`.
+The server uses Streamable HTTP at `/mcp` and serves artifacts at `/files/{sha256}.{extension}`. It exposes 9 tools under registry name `cannabis-2026`. See [server.json](server.json) and [api/tools.json](api/tools.json) for the exact contract. The scientific backend is pinned to `4be1e94c912db7a2790c831fb01d098ad290a88a`.
 
 ## Start the service
 
