@@ -244,14 +244,14 @@ wheels = [
 
 [[package]]
 name = "cannabis-biopesticide-mcp-server"
-version = "0.2.2"
+version = "0.2.3"
 source = { editable = "." }
 dependencies = [
     { name = "chem-repro-suite" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "chem-repro-suite", git = "https://github.com/chemagents/chem-repro-suite.git?rev=4be1e94c912db7a2790c831fb01d098ad290a88a" }]
+requires-dist = [{ name = "chem-repro-suite", git = "https://github.com/chemagents/chem-repro-suite.git?rev=cf4509ce4da0be3fdc485306031393bb8a4842c5" }]
 
 [[package]]
 name = "catboost"
@@ -349,8 +349,8 @@ wheels = [
 
 [[package]]
 name = "chem-repro-suite"
-version = "0.4.4"
-source = { git = "https://github.com/chemagents/chem-repro-suite.git?rev=4be1e94c912db7a2790c831fb01d098ad290a88a#4be1e94c912db7a2790c831fb01d098ad290a88a" }
+version = "0.4.6"
+source = { git = "https://github.com/chemagents/chem-repro-suite.git?rev=cf4509ce4da0be3fdc485306031393bb8a4842c5#cf4509ce4da0be3fdc485306031393bb8a4842c5" }
 dependencies = [
     { name = "boto3" },
     { name = "catboost" },

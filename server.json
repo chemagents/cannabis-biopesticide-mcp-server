@@ -22,7 +22,7 @@
   ],
   "smoke_tool": "cannabis2026_dataset_audit",
   "core_repository": "https://github.com/chemagents/chem-repro-suite",
-  "core_commit": "4be1e94c912db7a2790c831fb01d098ad290a88a",
+  "core_commit": "cf4509ce4da0be3fdc485306031393bb8a4842c5",
   "deployment": {
     "shared_endpoint": null,
     "status": "not_deployed",

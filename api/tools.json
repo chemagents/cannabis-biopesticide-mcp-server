@@ -1,5 +1,5 @@
 {
-  "core_commit": "4be1e94c912db7a2790c831fb01d098ad290a88a",
+  "core_commit": "cf4509ce4da0be3fdc485306031393bb8a4842c5",
   "study": "cannabis",
   "tools": [
     {
@@ -393,7 +393,7 @@
     {
       "name": "cannabis2026_docking_comparisons",
       "title": null,
-      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDo registered pesticides and AChE-inactive references have different docking profiles?\nRecompute six two-sided Mann–Whitney tests, BH FDR, median differences and distributions.\nDoes not rerun Vina; tests source scores. Final DS1 subset remains unmapped.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_docking_comparisons.json; bind that output to this exact tool name (cannabis2026_docking_comparisons). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDo registered pesticides and AChE-inactive references have different docking profiles?\nRecompute six two-sided Mann\u2013Whitney tests, BH FDR, mean AND median differences and distributions.\nPreserve the article's mismatch: numerical delta values match means, while its methods define medians.\nDoes not rerun Vina; tests source scores. Final DS1 subset remains unmapped.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_docking_comparisons.json; bind that output to this exact tool name (cannabis2026_docking_comparisons). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
       "inputSchema": {
         "properties": {},
         "type": "object",
@@ -781,12 +781,13 @@
     {
       "name": "cannabis2026_select_residues",
       "title": null,
-      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nWhich target residues survive Appendix A's training-only RMT and 98% energy-contribution gate?\nFit on an explicit source outer split; choose top-m by inner-validation ROC-AUC on cumulative raw\nenergies, retain original columns, export split registry and train/test features. Returns spectrum,\nfull m scan and contribution audit. This is not the older global RMT95/point-biserial protocol.\nUnreported numerical choices and unverified final-paper split equivalence are explicitly disclosed.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_select_residues.json; bind that output to this exact tool name (cannabis2026_select_residues). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nWhich target residues survive Appendix A's training-only RMT and 98% energy-contribution gate?\ntarget=all (default) runs all six targets; select one named target for a narrower diagnostic.\nFit on an explicit source outer split; choose top-m by inner-validation ROC-AUC on cumulative raw\nenergies, retain original columns, export split registry and train/test features. Returns spectrum,\nfull m scan and contribution audit. This is not the older global RMT95/point-biserial protocol.\nUnreported numerical choices and unverified final-paper split equivalence are explicitly disclosed.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_select_residues.json; bind that output to this exact tool name (cannabis2026_select_residues). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
       "inputSchema": {
         "properties": {
           "target": {
-            "default": "GLC1",
+            "default": "all",
             "enum": [
+              "all",
               "GSTE2",
               "ACHE",
               "GLC1",
@@ -1206,7 +1207,7 @@
     {
       "name": "cannabis2026_validate_rte",
       "title": null,
-      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDo RTE features discriminate pesticide and AChE-inactive reference compounds? Actually fit\nCatBoost and linear SVM for all six proteins and ALL6, with Appendix A residue selection refitted\non each requested source outer split; default is all 30 source splits (420 fits).\nA configured execution cache is verified against archived algorithm/software/source data and\nmetrics are recomputed from held-out scores; cached fits are explicitly distinguished from new training.\nReturn ROC-AUC, both PR area definitions, FPR, recall,\nconfusion counts and downloaded held-out predictions. Optionally export fitted models. Source\nfolds and explicit unspecified hyperparameter choices are not asserted to match final-paper runs.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_validate_rte.json; bind that output to this exact tool name (cannabis2026_validate_rte). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nReproduce Figure3 RTE discrimination using CatBoost and linear SVM for all six proteins\nand ALL6. paper_kfold10 (default) follows the caption's ten-fold validation: ten disjoint test\nfolds, 140 fits, train-only AppendixA selection and separate fold mean/SD and pooled OOF.\nSource authors' exact memberships and hyperparameters are unavailable; explicit seed42\nstratified folds are saved. source_random preserves all30 deposited repeated80/20holdouts\n(420 fits), a separate code-replay protocol that must not be relabeled ten-fold validation.\nsplit_indices selects0..9 in paper mode or0..29 in source mode; None runs all folds.\nReturn complete predictions, residue-selection audits and scientific figures. For Appendix A\neigenspectrum and energy-gate plots on a deposited source split, also use select_residues;\ntarget=all covers all six targets in one response. Verified\ncached training is labeled separately from a new fit. No parameter is tuned to a paper number.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_validate_rte.json; bind that output to this exact tool name (cannabis2026_validate_rte). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
       "inputSchema": {
         "properties": {
           "split_indices": {
@@ -1236,6 +1237,14 @@
           "include_models": {
             "default": false,
             "type": "boolean"
+          },
+          "protocol": {
+            "default": "paper_kfold10",
+            "enum": [
+              "paper_kfold10",
+              "source_random"
+            ],
+            "type": "string"
           }
         },
         "type": "object",
@@ -1623,12 +1632,13 @@
     {
       "name": "cannabis2026_open_toxicity_validation",
       "title": null,
-      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_open_tox_2026.\nReproduce Supplement S3's open toxicity benchmark: five base learners, mean blend and source\nmeta-stack on pinned TOXRIC data. Uses a separately pinned worker environment and actual saved\nOOF predictions; cached runs are verified. Source meta CV is not strictly nested or scaffold-disjoint.\nThese open benchmarks do not replace main-text Syntelly outputs. Reproductive has no scaffold reference.\nThe two aquatic endpoints expose separate TOXRIC-only and augmented TOXRIC+ECOTOX cohorts;\nsample counts and estimator choices must remain explicit in random/scaffold comparisons.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_open_toxicity_validation.json; bind that output to this exact tool name (cannabis2026_open_toxicity_validation). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_open_tox_2026.\nReproduce the complete Supplement S3 open benchmark. Defaults execute every reported\nendpoint/split combination and BOTH explicitly labeled aquatic cohorts (11 replays covering\nseven reported references); no reproductive scaffold value is invented. Choose an explicit\nendpoint/scheme/cohort for one replay. All five base learners, mean blend and source meta-stack\nare retained, with actual saved OOF scores independently verified. No estimator is selected\nto force agreement. Return a combined table and same-cohort/same-estimator random/scaffold\ncomparisons; source meta CV is not strictly nested or scaffold-disjoint. Open benchmarks are\nseparate from main-text Syntelly profiles. Requires the pinned open-toxicity worker environment.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_open_toxicity_validation.json; bind that output to this exact tool name (cannabis2026_open_toxicity_validation). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
       "inputSchema": {
         "properties": {
           "endpoint": {
-            "default": "ames",
+            "default": "all",
             "enum": [
+              "all",
               "ames",
               "reproductive",
               "daphnia",
@@ -1637,16 +1647,18 @@
             "type": "string"
           },
           "scheme": {
-            "default": "random",
+            "default": "reported",
             "enum": [
+              "reported",
               "random",
               "source_scaffold"
             ],
             "type": "string"
           },
           "cohort": {
-            "default": "toxric",
+            "default": "both",
             "enum": [
+              "both",
               "toxric",
               "toxric_ecotox"
             ],
@@ -2038,7 +2050,7 @@
     {
       "name": "cannabis2026_open_toxicity_profile",
       "title": null,
-      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nHow do the available Cannabis compounds compare with pesticide references under open\ntoxicity models, and how applicable are the predictions? Fit the existing ChemAgents open\ntwo-booster approximation motivated by Syntelly 2024, validate identity-random/scaffold 5-fold,\nand predict every source compound. Return per-compound values, cohort comparisons, kNN domain\nscores and training overlap. Uses verified caches after the first CPU run. These are new open\npredictions; final-paper Syntelly weights/cohorts and absolute aquatic units are unavailable.\nIncludes named predictions and endpoint-specific domain/overlap matrices for all ten reviewed\nFigure4 connectivities, with full candidate-level CSV evidence. These are source-model estimates.\nhERG is channel blockade; a separate broad hepatotoxicity output is not invented from DILI.\nrecipe=nested_paper2024_v2 replays completed nested-tuning runs with applied 2024 preparation,\ninner-fold feature selection and verified saved models. Request explicit endpoints; unavailable\ncompleted runs are reported as unavailable, without falling back to fixed-v1 predictions.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_open_toxicity_profile.json; bind that output to this exact tool name (cannabis2026_open_toxicity_profile). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nHow do the available Cannabis compounds compare with pesticide references under open\ntoxicity models, and how applicable are the predictions? Fit the existing ChemAgents open\ntwo-booster approximation motivated by Syntelly 2024, validate identity-random/scaffold 5-fold,\nand predict every source compound. Return per-compound values, cohort comparisons, kNN domain\nscores and training overlap. Uses verified caches after the first CPU run. These are new open\npredictions; final-paper Syntelly weights/cohorts and absolute aquatic units are unavailable.\nIncludes named predictions and endpoint-specific domain/overlap matrices for all ten reviewed\nFigure4 connectivities, with full candidate-level CSV evidence. These are source-model estimates.\nhERG is channel blockade; a separate broad hepatotoxicity output is not invented from DILI.\nrecipe=nested_paper2024_v2 replays completed nested-tuning runs with applied 2024 preparation,\ninner-fold feature selection and verified saved models. Returns each requested endpoint in a coverage table; absent completed models are explicitly\nunavailable while other endpoints are still verified. No fallback to fixed-v1 predictions.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_open_toxicity_profile.json; bind that output to this exact tool name (cannabis2026_open_toxicity_profile). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
       "inputSchema": {
         "properties": {
           "endpoints": {
@@ -2462,7 +2474,7 @@
     {
       "name": "cannabis2026_validate_dmpnn",
       "title": null,
-      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDoes the structure-based Cannabis DMPNN transfer to unseen scaffolds? Actually train Chemprop\ndirected-bond message passing plus train-normalized RDKit2D descriptors under the published\ndepth3/hidden300/dropout0.1/mean-sum-norm configuration. paired_cv evaluates both random and\nscaffold five-fold CV, with separate validation subsets, best checkpoints and complete held-out\npredictions. source_random uses the existing RTE outer split registry for matched fusion studies;\nit defaults to all30source splits, or the explicitly requested indices. Original final3403labels\nand author fold/checkpoint details are absent: the available3171labels are used and all deviations\ndeclared. PR trapezoidal area and average precision are separate; class scores are not measured\npesticide efficacy. Long CPU training is cached; incomplete runs resume only completed verified folds.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_validate_dmpnn.json; bind that output to this exact tool name (cannabis2026_validate_dmpnn). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
+      "description": "Study: Cannabis2026; paper DOI: 10.3390/ijms27188000; dataset: cannabis_2026.\nDoes the structure-based Cannabis DMPNN transfer to unseen scaffolds? Actually train Chemprop\ndirected-bond message passing plus train-normalized RDKit2D descriptors under the published\ndepth3/hidden300/dropout0.1/mean-sum-norm configuration. paired_cv evaluates both random and\nscaffold five-fold CV, with separate validation subsets, best checkpoints and complete held-out\npredictions. source_random uses the existing RTE outer split registry for matched fusion studies;\nit defaults to all30source splits, or the explicitly requested indices. Original final3403labels\nand author fold/checkpoint details are absent: the available3171labels are used and all deviations\ndeclared. PR trapezoidal area and average precision are separate; class scores are not measured\npesticide efficacy. The reported3403 standardized reference molecules are not proof of the\nauthors' exact DMPNN training membership. Long CPU training is cached; incomplete runs resume only completed verified folds.\nReturns ONE complete AnalysisResult JSON object. Suggested direct output name: cannabis2026_validate_dmpnn.json; bind that output to this exact tool name (cannabis2026_validate_dmpnn). Downloadable CSVs and figures are listed inside artifacts; their actual filenames are returned by execution, not guessed in advance. For a comparison mode, all labeled variants belong to this one JSON result.",
       "inputSchema": {
         "properties": {
           "protocol": {

@@ -1,9 +1,9 @@
 [project]
 name = "cannabis-biopesticide-mcp-server"
-version = "0.2.2"
+version = "0.2.3"
 description = "Scientific MCP server for cannabis; shared ChemAgents runtime"
 requires-python = ">=3.12,<3.13"
-dependencies = ["chem-repro-suite @ git+https://github.com/chemagents/chem-repro-suite.git@4be1e94c912db7a2790c831fb01d098ad290a88a"]
+dependencies = ["chem-repro-suite @ git+https://github.com/chemagents/chem-repro-suite.git@cf4509ce4da0be3fdc485306031393bb8a4842c5"]
 
 [project.scripts]
 cannabis-biopesticide-mcp-server = "cannabis_biopesticide_mcp:main"
@@ -142,3 +142,7 @@ constraint-dependencies = [
   "webencodings==0.6.1",
   "websockets==17.4",
 ]
+
+[tool.pytest.ini_options]
+# Archived predecessor tests belong to the legacy runtime, not this wrapper.
+testpaths = ["tests"]

@@ -1,0 +1,119 @@
+{
+  "date": "2026-11-19",
+  "kind": "direct MCP validation; not CoScientist end-to-end",
+  "core_commit": "cf4509ce4da0be3fdc485306031393bb8a4842c5",
+  "main_run_core_commit": "7b742de30e7360840e03ca9988346ba55366a838",
+  "calls": [
+    {
+      "tool": "cannabis2026_dataset_audit",
+      "arguments": {},
+      "status": "partial",
+      "elapsed_seconds": 1.351,
+      "verified_artifacts": 7,
+      "response_sha256": "468c1641a3c0ad017a196d9073645b1276cacdfed7d1a3d99876180352373539"
+    },
+    {
+      "tool": "cannabis2026_docking_comparisons",
+      "arguments": {},
+      "status": "success",
+      "elapsed_seconds": 0.796,
+      "verified_artifacts": 5,
+      "response_sha256": "0489f6bd67dcc7e76b01cf9400cb9ce5bbe74a8e48049f17467b319ad911995c"
+    },
+    {
+      "tool": "cannabis2026_select_residues",
+      "arguments": {
+        "target": "all"
+      },
+      "status": "partial",
+      "elapsed_seconds": 9.346,
+      "verified_artifacts": 49,
+      "response_sha256": "9f6a02dbd2278bc7e3471bd604fd01f497ca23de4874c511d9da9a73d60bab20"
+    },
+    {
+      "tool": "cannabis2026_validate_rte",
+      "arguments": {
+        "protocol": "paper_kfold10"
+      },
+      "status": "partial",
+      "elapsed_seconds": 0.848,
+      "verified_artifacts": 11,
+      "response_sha256": "fd2144e4d642739ce2cd0c78bb72edd4ed98ab528015f0f1754110467b5dca97"
+    },
+    {
+      "tool": "cannabis2026_validate_dmpnn",
+      "arguments": {
+        "protocol": "paired_cv"
+      },
+      "status": "partial",
+      "elapsed_seconds": 0.305,
+      "verified_artifacts": 21,
+      "response_sha256": "9e625a0de9dec23a4a3182e223fc5d943d413cc1f4ac4b8593b4073699efa434"
+    },
+    {
+      "tool": "cannabis2026_validate_dmpnn",
+      "arguments": {
+        "protocol": "source_random"
+      },
+      "status": "partial",
+      "elapsed_seconds": 0.565,
+      "verified_artifacts": 13,
+      "response_sha256": "a6b797b31cb25ca33659e24e631fc33b1778b66d6b8d3a562173388cf526236e"
+    },
+    {
+      "tool": "cannabis2026_evaluate_fusion",
+      "arguments": {
+        "protocol": "paired_cv"
+      },
+      "status": "partial",
+      "elapsed_seconds": 0.805,
+      "verified_artifacts": 24,
+      "response_sha256": "9a757e079496b48ca1a6d9763509ccd8892a4936d4f54bd42c2e1d46eacace04"
+    },
+    {
+      "tool": "cannabis2026_evaluate_fusion",
+      "arguments": {
+        "protocol": "source_random"
+      },
+      "status": "partial",
+      "elapsed_seconds": 1.203,
+      "verified_artifacts": 16,
+      "response_sha256": "67195ea12096504e12e771f79b1ec533523876f64d66e6b3a760db476b4a8f1f"
+    },
+    {
+      "tool": "cannabis2026_open_toxicity_validation",
+      "arguments": {},
+      "status": "partial",
+      "elapsed_seconds": 0.321,
+      "verified_artifacts": 38,
+      "response_sha256": "c42d46aa682fd43e3a6eb1bcdd9006a0bf28fba1c3aa34f059e3d613f8593232"
+    },
+    {
+      "tool": "cannabis2026_open_toxicity_profile",
+      "arguments": {
+        "recipe": "nested_paper2024_v2"
+      },
+      "status": "partial",
+      "elapsed_seconds": 152.47,
+      "verified_artifacts": 56,
+      "response_sha256": "65c59b6217fe7f0eca5a0d26ae09e675f94f2e9823d174a555a6eca61826c6f0"
+    },
+    {
+      "tool": "cannabis2026_prioritize_candidates",
+      "arguments": {},
+      "status": "partial",
+      "elapsed_seconds": 1.226,
+      "verified_artifacts": 10,
+      "response_sha256": "6586709ffc70ae4ccd3692ff6be1818931ffd0eb8d75e8aee17cfb298067b3a8"
+    }
+  ],
+  "independent_checks": {
+    "calls": 11,
+    "downloaded_artifacts_verified": 250,
+    "fusion_prediction_values_recomputed": 76176,
+    "rte_heldout_rows": 44394,
+    "rte_fits": 140,
+    "toxicology_requested": 9,
+    "caveat": "Model caches verified, not newly trained; unresolved author cohorts and checkpoints remain unavailable"
+  }
+}
