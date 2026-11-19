@@ -15,6 +15,8 @@ Scientific code and source data are shared through [chem-repro-suite](https://gi
 
 | Tool | What it returns |
 |---|---|
+| `cannabis2026_reproduce_author_code` | Original-code RMT95 refits on all 30 deposited splits; complete metrics, checkpoints checks and pure DMPNN results |
+| `cannabis2026_recovered_author_cohort` | Local 2465-record archive, 1010 archived scores above 0.70, exact structure alignment and unresolved score provenance |
 | `cannabis2026_dataset_audit` | Source cohorts, identity overlap and residue-matrix coverage |
 | `cannabis2026_docking_comparisons` | Six target comparisons, effect directions and BH FDR correction |
 | `cannabis2026_select_residues` | Training-only Appendix A RMT and energy-based residue selection |
@@ -35,17 +37,22 @@ See [REPRODUCTION_QUESTIONS.md](REPRODUCTION_QUESTIONS.md) for further questions
 
 ## Reproduction fidelity
 
-| Analysis | Recomputed result / limitation |
-|---|---|
-| Source cohort | 5,920 records; mapping to the paper’s final 2,465 queries is unavailable |
-| RTE validation | 420 fits; ALL6 CatBoost ROC-AUC 0.821755 ± 0.014796 versus reported 0.802 ± 0.017 |
-| Paired DMPNN ROC-AUC | 0.915494 random / 0.892974 scaffold on the available source cohort |
-| Paired product-score ROC-AUC | 0.913629 random / 0.886159 scaffold |
-| Product-score FPR reduction | Approximately 48% random / 57% scaffold, with lower recall |
+The deposited [canpest code](https://github.com/chemagents/canpest) is now replayed separately from the article-based reconstruction. All 30 original train/test partitions were used;95 selected residues match the source in membership and order. The original DMPNN, descriptor preprocessing, validation-selected HGB blend, CatBoost and SVM functions were executed without algorithm changes. All 30 exported neural checkpoints were reloaded and their test scores checked. The MCP independently recomputes metrics from 19,050 held-out prediction rows.
 
-RTE statistics are mean ± SD over 30 repeated holdouts, not independent OOF observations. The available cohort is not silently truncated to match the paper. Some query structures overlap the labeled reference sets, so their predictions are not external validation. Missing original component predictions and occurrence annotations prevent an exact replay of the 44-candidate selection.
+| Actual computation | ROC-AUC mean | FPR mean |
+|---|---:|---:|
+| Source DMPNN/HGB blend | 0.929048 | 11.7391% |
+| Source blend × CatBoost RMT95 | 0.918767 | 4.5596% |
+| Pure DMPNN, separately evaluated | 0.923708 | 12.1182% |
+| Pure DMPNN × CatBoost RMT95 | 0.917570 | 5.0613% |
 
-Open toxicology is a reconstruction informed by the 2024 method, **not the original Syntelly service or weights**. `fixed_public_v1` and `nested_paper2024_v2` have different training requirements; the nested recipe requires separately registered completed runs. A product score is not a calibrated probability, and candidate ranking does not establish efficacy or environmental safety. The superseded implementation remains in `legacy/`; its HGB outputs are not current DMPNN results.
+Full per-split values, sample SDs, recall and true positives lost are returned by the tool. The source score called DMPNN contains a nonzero HGB contribution in 25/30 new fits. Pure neural results are kept separate. Original-code RMT selection uses global labels and an in-sample inner diagnostic; this is source-code reproduction, not leakage-free independent validation.
+
+The source RMT95 reference is ROC-AUC 0.9167 / FPR 5.14%. The article's 0.9176 / 4.92% is attributed by the deposited documentation to a later RMT95+RTE390 geometric mixture, excluded from its rerun. These protocols are not silently substituted. The article also differs from deposited code in dropout, readout aggregation, selection and SVM kernel. [Exact protocol comparison and refitting instructions](https://github.com/chemagents/chem-repro-suite/blob/9e7a91e4aa643053ac7632daa5e556304b3c35b0/CANNABIS_AUTHOR_REPLAY.md).
+
+A local author table recovers 2,465 exact source structures and 1,010 archived scores >=0.70. Its score lineage remains unverified; chemical class annotations do not establish CCD secondary-metabolite status. All ten Figure 4 structures are aligned, but the complete 44-compound selection is not recovered. The tool exposes the two candidates below 0.70 in the archived score rather than treating it as a proven initial DMPNN probability.
+
+Open toxicology remains a separate reconstruction, not the original Syntelly weights. Stored docking scores are reanalyzed; a new docking campaign is not implied. Full-article reproduction and an end-to-end CoScientist report are not certified by these direct MCP results.
 
 ## Run locally
 

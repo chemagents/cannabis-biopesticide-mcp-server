@@ -5,7 +5,7 @@ import httpx
 from fastmcp import Client
 
 async def check(study):
-    specifications={'heracleum':(8,'heracleum2026_dataset_audit'), 'mannich':(10,'mannich_dataset_overview'), 'cannabis':(9,'cannabis2026_dataset_audit')}
+    specifications={'heracleum':(8,'heracleum2026_dataset_audit'), 'mannich':(10,'mannich_dataset_overview'), 'cannabis':(11,'cannabis2026_dataset_audit')}
     count,tool=specifications[study]
     with socket.socket() as listener:
         listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]

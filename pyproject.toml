@@ -1,9 +1,9 @@
 [project]
 name = "cannabis-biopesticide-mcp-server"
-version = "0.2.3"
+version = "0.2.4"
 description = "Scientific MCP server for cannabis; shared ChemAgents runtime"
 requires-python = ">=3.12,<3.13"
-dependencies = ["chem-repro-suite @ git+https://github.com/chemagents/chem-repro-suite.git@cf4509ce4da0be3fdc485306031393bb8a4842c5"]
+dependencies = ["chem-repro-suite @ git+https://github.com/chemagents/chem-repro-suite.git@9e7a91e4aa643053ac7632daa5e556304b3c35b0"]
 
 [project.scripts]
 cannabis-biopesticide-mcp-server = "cannabis_biopesticide_mcp:main"
@@ -36,7 +36,7 @@ constraint-dependencies = [
   "charset-normalizer==3.5.2",
   "click==8.5.1",
   "cloudpickle==3.1.2",
-  "colorama==0.4.6",
+  "colorama==0.4.7",
   "contourpy==1.4.0",
   "cronsim==2.8",
   "cryptography==50.0.2",
